@@ -1,0 +1,169 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground: #0a0a0a;
+  --background: #ffffff;
+}
+
+/* Ensure smooth background transition */
+html,
+body {
+  background-color: #ffffff;
+  color: #0a0a0a;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body {
+  font-family: "Inter", Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  background-color: #ffffff;
+}
+
+/* Prevents any unexpected background flashes */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth page transitions */
+main {
+  background-color: #ffffff;
+  min-height: 100vh;
+  transition: background-color 0.3s ease;
+}
+
+/* Additional styles to maintain white background consistency */
+#__next,
+.layout-container {
+  background-color: #ffffff;
+}
+
+/* Optional: Soft focus and selection styles */
+::selection {
+  background-color: #e6f3ff;
+  color: #0a0a0a;
+}
+
+/* Rest of your existing CSS can remain the same */
+@import "slick-carousel/slick/slick.css";
+@import "slick-carousel/slick/slick-theme.css";
+
+/* Custom slider styles */
+.slick-slider {
+  position: relative;
+  height: 100%;
+}
+
+.slick-list,
+.slick-track,
+.slick-slide > div {
+  height: 100%;
+}
+
+.slick-dots {
+  bottom: 25px !important;
+  z-index: 20;
+}
+
+.slick-dots li button:before {
+  color: #333 !important;
+  opacity: 0.5;
+  font-size: 8px !important;
+}
+
+.slick-dots li.slick-active button:before {
+  opacity: 1;
+}
+
+.slick-slide {
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.slick-slide.slick-active {
+  opacity: 1;
+}
+
+/* Ken Burns Animation */
+@keyframes kenBurns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.05);
+  }
+}
+
+.animate-ken-burns {
+  animation: kenBurns 10s ease infinite alternate;
+}
+
+/* Responsive Adjustments */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Responsive Text and Layout */
+@media (max-width: 992px) {
+  .hero__slider {
+    height: 530px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero__slider {
+    height: 450px;
+  }
+
+  .slick-dots {
+    bottom: 8px !important;
+  }
+
+  .slick-dots li button:before {
+    font-size: 6px !important;
+  }
+}
+
+/* Large Screen Responsive Toggles */
+@media (max-width: 1024px) {
+  .lg\:hidden {
+    display: block !important;
+  }
+
+  .lg\:flex {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  .lg\:hidden {
+    display: none !important;
+  }
+
+  .lg\:flex {
+    display: flex !important;
+  }
+}
+
+/* Smooth Scrolling and Layout */
+html {
+  scroll-behavior: smooth;
+}
+
+main {
+  margin-top: 160px;
+}
+
+/* Touch and Scroll Handling */
+.slick-slider .slick-list,
+.slick-slider .slick-track {
+  touch-action: pan-y pinch-zoom;
+}
+
+/* Additional Custom Styles */
+.bg-gradient-sky {
+  background: linear-gradient(135deg, #e6f2ff 0%, #b3d9ff 50%, #80bfff 100%);
+}
