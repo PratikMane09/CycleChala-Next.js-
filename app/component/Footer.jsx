@@ -247,7 +247,7 @@ const Footer = () => {
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         aria-label="Scroll to Top"
-        className="fixed bottom-8 right-8 
+        className="fixed bottom-8 right-4 
           w-12 h-12 
           bg-gradient-to-r from-blue-400 to-blue-600 
           hover:from-blue-500 hover:to-blue-400 

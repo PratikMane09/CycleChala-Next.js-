@@ -1,5 +1,7 @@
 import React from "react";
 import StoreLocator from "./component/StoreLocator";
+import Header from "../component/Header";
+import Footer from "../component/Footer";
 
 export const metadata = {
   title: "Prakash Cycle Mart - Store Locations",

@@ -14,6 +14,11 @@ import {
   ListItemText,
   createTheme,
   ThemeProvider,
+  Button,
+  Divider,
+  Dialog,
+  DialogContent,
+  Stack,
 } from "@mui/material";
 import {
   Phone,
@@ -25,8 +30,11 @@ import {
   X,
   Globe,
   Clock,
+  LogIn,
 } from "lucide-react";
-
+import { useWishlist, WishlistProvider } from "../context/WishlistContext";
+import { useCart } from "../context/CartContext";
+import SerchSection from "./SearchSection";
 // Custom theme with professional white color scheme and subtle definition
 const theme = createTheme({
   typography: {
@@ -37,8 +45,8 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           backgroundColor: "#FFFFFF",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)", // Very subtle shadow
-          borderBottom: "1px solid rgba(0,0,0,0.06)", // Subtle border
+          boxShadow: "0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)",
+          borderBottom: "1px solid rgba(0,0,0,0.06)",
         },
       },
     },
@@ -58,16 +66,28 @@ const useActiveLink = () => {
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [mobileMenu, setMobileMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const { count: wishlistCount, fetchwishlist } = useWishlist();
+  const { count: cartcount } = useCart();
+
   const router = useRouter();
   const isActive = useActiveLink();
 
   const navLinks = [
     { path: "/", display: "Shop" },
+    { path: "/shop", display: "Cycles" },
     { path: "/about", display: "About us" },
     { path: "/locate", display: "Locate Store" },
     { path: "/contact", display: "Contact" },
   ];
+  const handleSearch = (e) => {
+    e.preventDefault(); // Prevent default form submission
+    if (searchQuery.trim()) {
+      router.push(`/shop?query=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
 
   // Handle scroll effect
   useEffect(() => {
@@ -85,46 +105,10 @@ const Header = () => {
       window.removeEventListener("routeChangeStart", handleRouteChange);
   }, []);
 
-  // Top Bar Component
-  const TopBar = () => (
-    <div className="hidden md:block bg-gray-50 text-gray-800 py-2 border-b border-gray-100">
-      <Container maxWidth="lg" className="px-4">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <span className="font-medium text-sm">Need Help?</span>
-            <a
-              href="tel:+917038698440"
-              className="flex items-center gap-2 text-gray-800 hover:text-blue-600 transition-colors"
-            >
-              <span className="bg-blue-50 p-1 rounded-full">
-                <Phone size={14} className="text-blue-600" />
-              </span>
-              <span className="text-sm font-medium">+917038698440</span>
-            </a>
-          </div>
-          <div className="flex items-center gap-6">
-            <Link
-              href="/login"
-              className="flex items-center gap-2 text-gray-800 hover:text-blue-600 transition-colors text-sm font-medium"
-            >
-              <User size={16} /> Login
-            </Link>
-            <Link
-              href="/register"
-              className="flex items-center gap-2 text-gray-800 hover:text-blue-600 transition-colors text-sm font-medium"
-            >
-              <User size={16} /> Register
-            </Link>
-          </div>
-        </div>
-      </Container>
-    </div>
-  );
-
   // Middle Bar Component
   const MiddleBar = () => (
     <div
-      className={`bg-white py-4 border-b border-gray-100 ${
+      className={`bg-white py-4 border-b border-gray-100 relative ${
         isScrolled ? "shadow-sm" : ""
       }`}
     >
@@ -192,10 +176,9 @@ const Header = () => {
   return (
     <ThemeProvider theme={theme}>
       <div
-        className={`fixed top-0 w-full z-50 bg-white 
+        className={`fixed top-0 w-full z-[40] bg-white 
         ${isScrolled ? "shadow-md" : "border-b border-gray-100"}`}
       >
-        {/* <TopBar /> */}
         <MiddleBar />
 
         {/* Navigation Bar */}
@@ -205,6 +188,8 @@ const Header = () => {
             bgcolor: "white",
             boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
             borderBottom: "1px solid rgba(0,0,0,0.06)",
+            position: "relative",
+            zIndex: "auto",
           }}
         >
           <Container maxWidth="lg">
@@ -219,7 +204,6 @@ const Header = () => {
               >
                 <MenuIcon className="text-gray-800" />
               </IconButton>
-
               {/* Desktop Navigation */}
               <Box className="hidden lg:flex gap-8">
                 {navLinks.map((link) => (
@@ -237,35 +221,165 @@ const Header = () => {
                   </Link>
                 ))}
               </Box>
-
-              {/* Action Icons with WhatsApp Button for Mobile */}
+              {/* Action Icons with Auth Buttons */}
               <Box className="flex items-center gap-4">
-                <Box className="flex items-center gap-4 bg-gray-100 px-6 py-2 rounded-full">
-                  <Search
-                    className="text-gray-700 cursor-pointer hover:text-blue-600 transition-colors"
-                    size={20}
-                  />
-                  <Heart
-                    className="text-gray-700 cursor-pointer hover:text-blue-600 transition-colors"
-                    size={20}
-                  />
-                  <ShoppingCart
-                    className="text-gray-700 cursor-pointer hover:text-blue-600 transition-colors"
-                    size={20}
-                  />
-                </Box>
-                {/* Mobile WhatsApp Button */}
-                <a
-                  href="https://api.whatsapp.com/send?phone=8806582924"
-                  className="block lg:hidden ml-2"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 hover:bg-blue-600 transition-colors">
-                    <Phone size={20} className="text-white" />
+                <Box className="flex items-center gap-6 bg-gray-50 px-8 py-3 rounded-xl shadow-sm">
+                  {/* Search Section */}
+
+                  <SerchSection />
+
+                  {/* Wishlist Section */}
+                  <div
+                    className="relative group"
+                    onClick={() => {
+                      router.push("/wishlist");
+                    }}
+                  >
+                    <Heart
+                      className="text-gray-600 cursor-pointer group-hover:text-blue-600 transition-colors duration-300"
+                      size={22}
+                    />
+                    {wishlistCount > 0 && (
+                      <span
+                        className="absolute -top-2 -right-2 bg-blue-600 text-white 
+          text-xs font-semibold rounded-full w-5 h-5 flex items-center 
+          justify-center shadow-sm transform scale-100 group-hover:scale-110 
+          transition-transform duration-300"
+                      >
+                        {wishlistCount}
+                      </span>
+                    )}
                   </div>
-                </a>
+
+                  {/* Cart Section */}
+                  <div
+                    className="relative group"
+                    onClick={() => {
+                      router.push("/cart");
+                    }}
+                  >
+                    <ShoppingCart
+                      className="text-gray-600 cursor-pointer hover:text-blue-600 transition-colors duration-300"
+                      size={22}
+                    />
+                    {cartcount > 0 && (
+                      <span
+                        className="absolute -top-2 -right-2 bg-blue-600 text-white 
+          text-xs font-semibold rounded-full w-5 h-5 flex items-center 
+          justify-center shadow-sm transform scale-100 group-hover:scale-110 
+          transition-transform duration-300"
+                      >
+                        {cartcount}
+                      </span>
+                    )}
+                  </div>
+                </Box>
               </Box>
+
+              <Box className="hidden lg:flex items-center gap-3">
+                <Link href="/login" className="no-underline">
+                  <Button
+                    variant="outlined"
+                    startIcon={<LogIn size={18} />}
+                    className="transition-transform hover:-translate-y-0.5"
+                    sx={{
+                      minWidth: { lg: "120px", xl: "140px" },
+                      height: "42px",
+                      color: "#0284c7", // Sky blue 600
+                      borderColor: "#0284c7",
+                      borderWidth: "1.5px",
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                      borderRadius: "8px",
+                      textTransform: "none",
+                      "&:hover": {
+                        borderColor: "#0369a1", // Sky blue 700
+                        backgroundColor: "rgba(2, 132, 199, 0.02)",
+                      },
+                    }}
+                  >
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/register" className="no-underline">
+                  <Button
+                    variant="contained"
+                    startIcon={<User size={18} />}
+                    className="transition-transform hover:-translate-y-0.5"
+                    sx={{
+                      minWidth: { lg: "160px", xl: "180px" },
+                      height: "42px",
+                      backgroundColor: "#0284c7", // Sky blue 600
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                      borderRadius: "8px",
+                      textTransform: "none",
+                      boxShadow: "none",
+                      "&:hover": {
+                        backgroundColor: "#0369a1", // Sky blue 700
+                        boxShadow: "none",
+                      },
+                    }}
+                  >
+                    Create Account
+                  </Button>
+                </Link>
+              </Box>
+
+              <Box className="flex lg:hidden items-center">
+                <IconButton
+                  className="relative p-2 rounded-lg hover:bg-gray-50"
+                  onClick={() => setMobileMenu(true)}
+                >
+                  <User size={22} className="text-gray-700" />
+                </IconButton>
+              </Box>
+
+              {/* Mobile Menu */}
+              <Dialog
+                open={mobileMenu}
+                onClose={() => setMobileMenu(false)}
+                className="lg:hidden"
+                fullWidth
+                maxWidth="xs"
+              >
+                <DialogContent className="p-4">
+                  <Stack spacing={2}>
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      startIcon={<LogIn size={18} />}
+                      component={Link}
+                      href="/login"
+                      sx={{
+                        height: "48px",
+                        color: "#0284c7",
+                        borderColor: "#0284c7",
+                        borderWidth: "1.5px",
+                        borderRadius: "8px",
+                        textTransform: "none",
+                      }}
+                    >
+                      Sign In
+                    </Button>
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      startIcon={<User size={18} />}
+                      component={Link}
+                      href="/register"
+                      sx={{
+                        height: "48px",
+                        backgroundColor: "#0284c7",
+                        borderRadius: "8px",
+                        textTransform: "none",
+                      }}
+                    >
+                      Create Account
+                    </Button>
+                  </Stack>
+                </DialogContent>
+              </Dialog>
             </Toolbar>
           </Container>
         </AppBar>
@@ -280,8 +394,14 @@ const Header = () => {
             sx: {
               backgroundColor: "#FFFFFF",
               width: 280,
-              boxShadow: "0 4px 6px rgba(0,0,0,0.1)", // Added subtle shadow to drawer
+              boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
               borderRight: "1px solid rgba(0,0,0,0.06)",
+              zIndex: 45, // Lower than filter sidebar
+            },
+          }}
+          ModalProps={{
+            sx: {
+              zIndex: 45, // Keep consistent with PaperProps
             },
           }}
         >
@@ -323,10 +443,43 @@ const Header = () => {
                   </Link>
                 </ListItem>
               ))}
+
+              {/* Auth Links in Mobile Menu */}
+              <Divider sx={{ my: 2 }} />
+              <ListItem disablePadding>
+                <Link
+                  href="/login"
+                  className="text-gray-800 no-underline w-full px-6 py-3 hover:text-blue-600 hover:bg-blue-50"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <ListItemText
+                    primary="Login"
+                    primaryTypographyProps={{
+                      sx: { fontSize: "1rem" },
+                    }}
+                  />
+                </Link>
+              </ListItem>
+              <ListItem disablePadding>
+                <Link
+                  href="/register"
+                  className="text-gray-800 no-underline w-full px-6 py-3 hover:text-blue-600 hover:bg-blue-50"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <ListItemText
+                    primary="Register"
+                    primaryTypographyProps={{
+                      sx: { fontSize: "1rem" },
+                    }}
+                  />
+                </Link>
+              </ListItem>
             </List>
           </Box>
         </Drawer>
       </div>
+      <div className="h-[70px]" />{" "}
+      {/* Adjust this value based on your header height */}
     </ThemeProvider>
   );
 };

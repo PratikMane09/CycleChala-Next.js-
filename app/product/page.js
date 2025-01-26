@@ -1,0 +1,149 @@
+"use client";
+import React, { useState, useEffect } from "react";
+import { ChevronDown, ChevronUp, Star, Filter, Loader } from "lucide-react";
+import { apiService } from "../utils/apiService";
+import ProductGrid from "./compoenent/ProductGrid";
+import FilterSidebar from "./compoenent/FilterSidebar";
+import Footer from "../component/Footer";
+import Header from "../component/Header";
+
+const CycleShop = () => {
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        setLoading(true);
+        const [categoriesResponse, productsResponse] = await Promise.all([
+          apiService.fetchCategories(1, 20),
+          apiService.fetchProducts(),
+        ]);
+
+        setCategories(categoriesResponse.categories);
+        setProducts(productsResponse.data.products);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInitialData();
+  }, []);
+
+  const handleFilterChange = async (filters) => {
+    try {
+      setLoading(true);
+      const response = await apiService.fetchProducts(filters);
+      if (response.success) {
+        setProducts(response.data.products);
+      } else {
+        setError(response.error || "Failed to fetch products");
+      }
+    } catch (error) {
+      setError(error.message);
+      console.error("Error fetching products:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl text-red-600 mb-2">Error</h2>
+          <p className="text-gray-600">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className=" bg-gray-50">
+      <div className="max-w-7xl mx-auto">
+        {/* Main content wrapper with grid layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] ">
+          {/* Sticky Sidebar */}
+
+          <div className="hidden lg:block w-70 flex-shrink-0 sticky top-8 max-h-screen overflow-y-auto">
+            {" "}
+            <div className="space-y-6 ">
+              <h2 className="text-xl font-semibold text-gray-900">Filters</h2>
+              <FilterSidebar
+                categories={categories}
+                onFilterChange={handleFilterChange}
+                showMobileFilters={showMobileFilters}
+                setShowMobileFilters={setShowMobileFilters}
+              />
+            </div>
+          </div>
+
+          {/* Product Grid Section */}
+          <div className="p-6">
+            <div className="mt-10">
+              <h1 className="text-2xl font-bold text-gray-900">Our Products</h1>
+              <p className="text-gray-600 mt-2">
+                Discover our collection of high-quality cycles
+              </p>
+            </div>
+
+            {loading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="flex flex-col items-center gap-4">
+                  <Loader className="w-8 h-8 text-sky-600 animate-spin" />
+                  <p className="text-gray-600">Loading products...</p>
+                </div>
+              </div>
+            ) : (
+              <ProductGrid products={products} />
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Filter Button - Fixed Position */}
+      <button
+        className="lg:hidden fixed bottom-20 right-4 bg-sky-600 text-white p-4 rounded-full shadow-lg z-50 flex items-center gap-2"
+        onClick={() => setShowMobileFilters(true)}
+      >
+        <Filter className="w-5 h-5" />
+      </button>
+
+      {/* Mobile Filters Slide-over */}
+      {showMobileFilters && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 lg:hidden">
+          <div className="fixed inset-y-0 right-0 max-w-xs w-full bg-white shadow-xl animate-slide-in">
+            <div className="h-full flex flex-col">
+              <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
+                <button
+                  onClick={() => setShowMobileFilters(false)}
+                  className="p-2 rounded-md hover:bg-gray-100"
+                >
+                  <span className="sr-only">Close filters</span>
+                  <ChevronDown className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-4">
+                <FilterSidebar
+                  categories={categories}
+                  onFilterChange={handleFilterChange}
+                  showMobileFilters={showMobileFilters}
+                  setShowMobileFilters={setShowMobileFilters}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default CycleShop;

@@ -24,11 +24,17 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx",
-    "app/refund/page.jsx",
-    "app/locate/page.jsx",
-    "app/privacy/page.jsx",
-    "app/about/page.jsx",
-    "app/termscondition/page.jsx"
+    "app/refund/page.js",
+    "app/locate/page.js",
+    "app/privacy/page.js",
+    "app/about/page.js",
+    "app/termscondition/page.jsx",
+    "app/dashboard/admin/page.jsx",
+    "app/register/page.js",
+    "app/product/page.js",
+    "app/login/page.js",
+    "app/shipping/page.js",
+    "app/shop/page.jsx"
   ],
   "exclude": ["node_modules"]
 }

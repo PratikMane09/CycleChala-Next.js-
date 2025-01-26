@@ -17,7 +17,7 @@ body {
 
 body {
   font-family: "Inter", Arial, Helvetica, sans-serif;
-  min-height: 100vh;
+  /* min-height: 100vh; */
   background-color: #ffffff;
 }
 
@@ -27,11 +27,11 @@ body {
 }
 
 /* Smooth page transitions */
-main {
+/* main {
   background-color: #ffffff;
   min-height: 100vh;
   transition: background-color 0.3s ease;
-}
+} */
 
 /* Additional styles to maintain white background consistency */
 #__next,
@@ -100,11 +100,11 @@ main {
 }
 
 /* Responsive Adjustments */
-.container {
+/* .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1rem;
-}
+} */
 
 /* Responsive Text and Layout */
 @media (max-width: 992px) {
@@ -153,9 +153,9 @@ html {
   scroll-behavior: smooth;
 }
 
-main {
+/* main {
   margin-top: 160px;
-}
+} */
 
 /* Touch and Scroll Handling */
 .slick-slider .slick-list,

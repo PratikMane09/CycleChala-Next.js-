@@ -265,7 +265,7 @@ const StoreLocator = () => {
   );
 
   return (
-    <div className="min-h-screen bg-white pt-16 sm:pt-20 md:pt-24 pb-8 sm:pb-12 md:pb-16">
+    <div className="min-h-screen bg-white pt-6 sm:pt-20 md:pt-24 pb-8 sm:pb-12 md:pb-16">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12">
