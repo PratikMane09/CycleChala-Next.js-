@@ -420,28 +420,41 @@ const Header = () => {
           PaperProps={{
             sx: {
               backgroundColor: "#FFFFFF",
-              width: 280,
-              boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-              borderRight: "1px solid rgba(0,0,0,0.06)",
-              zIndex: 45, // Lower than filter sidebar
+              width: 320,
+              boxShadow: "0 8px 16px rgba(0,0,0,0.08)",
+              borderRight: "1px solid rgba(0,0,0,0.08)",
+              zIndex: 45,
             },
           }}
           ModalProps={{
             sx: {
-              zIndex: 45, // Keep consistent with PaperProps
+              zIndex: 45,
             },
           }}
         >
-          <Box className="h-full text-gray-900">
-            <div className="flex justify-end p-4">
+          <Box className="h-full bg-white">
+            {/* Header with Logo */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <div className="flex items-center space-x-2">
+                <img
+                  src="/api/placeholder/32/32"
+                  alt="Logo"
+                  className="h-8 w-8"
+                />
+                <span className="text-xl font-semibold text-gray-900">
+                  Company Name
+                </span>
+              </div>
               <IconButton
                 onClick={() => setIsMenuOpen(false)}
-                sx={{ color: "#121212" }}
+                className="text-gray-500 hover:text-gray-700"
               >
-                <X />
+                <X size={24} />
               </IconButton>
             </div>
-            <List>
+
+            {/* Navigation Links */}
+            <List className="py-4">
               {navLinks.map((link) => (
                 <ListItem
                   key={link.path}
@@ -450,12 +463,13 @@ const Header = () => {
                 >
                   <Link
                     href={link.path}
-                    className={`text-gray-800 no-underline w-full px-6 py-3 
-                      transition-colors duration-300 ${
-                        isActive(link.path)
-                          ? "text-blue-600 bg-blue-50"
-                          : "hover:text-blue-600 hover:bg-blue-50"
-                      }`}
+                    className={`flex items-center w-full px-6 py-4
+                  transition-all duration-200 no-underline
+                  ${
+                    isActive(link.path)
+                      ? "text-blue-600 bg-blue-50 font-medium"
+                      : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"
+                  }`}
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <ListItemText
@@ -463,7 +477,9 @@ const Header = () => {
                       primaryTypographyProps={{
                         sx: {
                           fontSize: "1rem",
-                          fontWeight: isActive(link.path) ? 600 : 400,
+                          letterSpacing: "-0.01em",
+                          fontWeight: isActive(link.path) ? 500 : 400,
+                          lineHeight: 1.5,
                         },
                       }}
                     />
@@ -471,36 +487,28 @@ const Header = () => {
                 </ListItem>
               ))}
 
-              {/* Auth Links in Mobile Menu */}
-              <Divider sx={{ my: 2 }} />
-              <ListItem disablePadding>
+              {/* Auth Section */}
+              <Divider className="my-4" />
+              <div className="px-6 py-4 space-y-3">
                 <Link
                   href="/login"
-                  className="text-gray-800 no-underline w-full px-6 py-3 hover:text-blue-600 hover:bg-blue-50"
+                  className="flex w-full py-3 px-6 text-white bg-blue-600 rounded-lg
+                font-medium text-center justify-center hover:bg-blue-700
+                transition-colors duration-200 no-underline"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <ListItemText
-                    primary="Login"
-                    primaryTypographyProps={{
-                      sx: { fontSize: "1rem" },
-                    }}
-                  />
+                  Login
                 </Link>
-              </ListItem>
-              <ListItem disablePadding>
                 <Link
                   href="/register"
-                  className="text-gray-800 no-underline w-full px-6 py-3 hover:text-blue-600 hover:bg-blue-50"
+                  className="flex w-full py-3 px-6 text-blue-600 bg-blue-50 rounded-lg
+                font-medium text-center justify-center hover:bg-blue-100
+                transition-colors duration-200 no-underline"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <ListItemText
-                    primary="Register"
-                    primaryTypographyProps={{
-                      sx: { fontSize: "1rem" },
-                    }}
-                  />
+                  Register
                 </Link>
-              </ListItem>
+              </div>
             </List>
           </Box>
         </Drawer>
