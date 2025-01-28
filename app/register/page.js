@@ -121,7 +121,7 @@ const RegisterForm = () => {
           },
           body: JSON.stringify({
             name: formData.name,
-            email: formData.email,
+            email: formData.email.toLowerCase(),
             phone: formData.phone,
             password: formData.password,
           }),
@@ -163,7 +163,7 @@ const RegisterForm = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: formData.email,
+          email: formData.email.toLowerCase(),
           otp: formData.otp,
         }),
       });
@@ -187,13 +187,13 @@ const RegisterForm = () => {
 
   return (
     <>
-      <div className="h-[750px]  bg-gradient-to-br from-sky-50 via-white to-sky-50 flex items-center justify-center">
+      <div className="h-[800px]    bg-gradient-to-br from-sky-50 via-white to-sky-50 flex items-center justify-center">
         {" "}
         <div className="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Paper elevation={3} className="overflow-hidden rounded-2xl">
             <div className="flex flex-col lg:flex-row">
               {/* Left Column - Image */}
-              <div className="w-full lg:w-1/2 relative bg-sky-500">
+              <div className="w-full lg:w-1/2 hidden md:block relative bg-sky-500">
                 <div className="absolute inset-0 bg-black bg-opacity-20" />
                 <div className="h-full flex flex-col justify-center p-3 relative z-10">
                   <img
@@ -214,7 +214,7 @@ const RegisterForm = () => {
               </div>
 
               {/* Right Column - Form */}
-              <div className="w-full lg:w-1/2 bg-white p-8 flex flex-col justify-center">
+              <div className="w-full h-full  lg:w-1/2 bg-white p-8 pb-10 flex flex-col justify-center">
                 <div className="max-w-md mx-auto w-full">
                   {error && <Alert className="mb-4">{error}</Alert>}
 

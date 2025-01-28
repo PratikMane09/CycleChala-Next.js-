@@ -21,7 +21,7 @@ import {
 const StoreLocator = () => {
   const [modalImage, setModalImage] = useState(null);
 
-  // Store Data (remains the same)
+  // Store Data
   const stores = [
     {
       id: 1,
@@ -50,36 +50,9 @@ const StoreLocator = () => {
       rating: 4.8,
       reviews: 156,
     },
-    {
-      id: 2,
-      name: "Prakash Cycle Mart - City Branch",
-      images: [
-        {
-          url: "/images/stores/shop2-1.jpg",
-          caption: "Showroom Entrance",
-        },
-        {
-          url: "/images/stores/shop2-2.jpg",
-          caption: "Kids Bikes Section",
-        },
-        {
-          url: "/images/stores/shop2-3.jpg",
-          caption: "Accessories Display",
-        },
-      ],
-      address: "Plot No. 456, Main Road",
-      city: "Aurangabad",
-      state: "Maharashtra",
-      pincode: "431001",
-      phone: "+91 8806582924",
-      email: "contact@prakashcycles.com",
-      timing: "8:00 AM - 9:00 PM",
-      rating: 4.9,
-      reviews: 142,
-    },
   ];
 
-  // Next Arrow Component
+  // Image Slider Components (same as before)
   const NextArrow = ({ onClick }) => (
     <button
       onClick={onClick}
@@ -94,7 +67,6 @@ const StoreLocator = () => {
     </button>
   );
 
-  // Prev Arrow Component
   const PrevArrow = ({ onClick }) => (
     <button
       onClick={onClick}
@@ -109,7 +81,6 @@ const StoreLocator = () => {
     </button>
   );
 
-  // Slider settings (remains the same)
   const sliderSettings = {
     dots: true,
     infinite: true,
@@ -131,7 +102,7 @@ const StoreLocator = () => {
     ],
   };
 
-  // Image Modal Component
+  // Image Modal Component (same as before)
   const ImageModal = ({ image, onClose }) => (
     <motion.div
       initial={{ opacity: 0 }}
@@ -167,84 +138,52 @@ const StoreLocator = () => {
     </motion.div>
   );
 
-  // Store Card Component
+  // Two-Column Store Card Component
   const StoreCard = ({ store }) => (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-sky-100 transform transition-transform duration-300 hover:-translate-y-1">
-      {/* Image Slider */}
-      <div className="relative h-[280px] sm:h-[320px] md:h-[380px]">
-        <Slider {...sliderSettings} className="h-full">
-          {store.images.map((image, index) => (
-            <div
-              key={index}
-              className="relative h-[280px] sm:h-[320px] md:h-[380px]"
-            >
-              <Image
-                src={image.url}
-                alt={image.caption}
-                fill
-                className="object-cover cursor-pointer transition-transform duration-300 hover:scale-105"
-                onClick={() => setModalImage(image)}
-              />
-              <button
-                onClick={() => setModalImage(image)}
-                className="absolute bottom-4 right-4 bg-sky-500/50 hover:bg-sky-500/75 text-white p-2 
-                  rounded-full transition-all duration-300 hover:scale-110"
-              >
-                <ZoomIn className="w-4 h-4 sm:w-5 sm:h-5" />
-              </button>
-              <div
-                className="absolute bottom-4 left-4 bg-sky-500/50 backdrop-blur-sm 
-                text-white px-2 py-1 sm:px-3 sm:py-1.5 rounded-full text-xs sm:text-sm"
-              >
-                {image.caption}
+    <div className="grid grid-cols-1 lg:grid-cols-2 bg-white rounded-2xl overflow-hidden shadow-xl border border-sky-100">
+      {/* Information Column */}
+      <div className="p-6 sm:p-8 bg-sky-50 flex flex-col justify-between">
+        <div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-sky-900 mb-6">
+            {store.name}
+          </h2>
+
+          <div className="space-y-4">
+            <div className="flex items-start space-x-3 text-sky-800">
+              <MapPin className="w-5 h-5 text-sky-500 mt-1 flex-shrink-0" />
+              <div>
+                <p className="text-sm">{store.address}</p>
+                <p className="text-sm">
+                  {store.city}, {store.state} - {store.pincode}
+                </p>
               </div>
             </div>
-          ))}
-        </Slider>
 
-        {/* Rating Badge */}
-        <div
-          className="absolute top-4 right-4 z-10 bg-sky-500/50 backdrop-blur-sm rounded-full 
-          px-2 py-1 sm:px-3 sm:py-1.5 flex items-center space-x-1 sm:space-x-2"
-        >
-          <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" />
-          <span className="text-sky-900 text-xs sm:text-sm">
-            {store.rating}
-          </span>
-          <span className="text-xs text-sky-700">({store.reviews})</span>
-        </div>
-      </div>
-
-      {/* Store Info */}
-      <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 bg-sky-50">
-        <h2 className="text-lg sm:text-2xl font-bold text-sky-900">
-          {store.name}
-        </h2>
-
-        <div className="grid gap-3 sm:gap-4">
-          <div className="flex items-start space-x-3 text-sky-800">
-            <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-sky-500 mt-1 flex-shrink-0" />
-            <div>
-              <p className="text-xs sm:text-sm">{store.address}</p>
-              <p className="text-xs sm:text-sm">
-                {store.city}, {store.state} - {store.pincode}
-              </p>
+            <div className="flex items-center space-x-3 text-sky-800">
+              <Phone className="w-5 h-5 text-sky-500 flex-shrink-0" />
+              <p className="text-sm">{store.phone}</p>
             </div>
-          </div>
 
-          <div className="flex items-center space-x-3 text-sky-800">
-            <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-sky-500 flex-shrink-0" />
-            <p className="text-xs sm:text-sm">{store.phone}</p>
-          </div>
+            <div className="flex items-center space-x-3 text-sky-800">
+              <Mail className="w-5 h-5 text-sky-500 flex-shrink-0" />
+              <p className="text-sm">{store.email}</p>
+            </div>
 
-          <div className="flex items-center space-x-3 text-sky-800">
-            <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-sky-500 flex-shrink-0" />
-            <p className="text-xs sm:text-sm">{store.email}</p>
-          </div>
+            <div className="flex items-center space-x-3 text-sky-800">
+              <Clock className="w-5 h-5 text-sky-500 flex-shrink-0" />
+              <p className="text-sm">{store.timing}</p>
+            </div>
 
-          <div className="flex items-center space-x-3 text-sky-800">
-            <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-sky-500 flex-shrink-0" />
-            <p className="text-xs sm:text-sm">{store.timing}</p>
+            {/* Rating */}
+            <div className="flex items-center space-x-2 mt-4">
+              <Star className="w-5 h-5 text-yellow-400" />
+              <span className="text-sky-900 text-sm font-semibold">
+                {store.rating}
+              </span>
+              <span className="text-xs text-sky-700">
+                ({store.reviews} reviews)
+              </span>
+            </div>
           </div>
         </div>
 
@@ -253,13 +192,45 @@ const StoreLocator = () => {
           href={`https://maps.google.com/?q=${store.address},${store.city}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full bg-gradient-to-r from-sky-500 to-blue-500 text-white py-2 sm:py-3 px-4 
+          className="mt-6 w-full bg-gradient-to-r from-sky-500 to-blue-500 text-white py-3 px-4 
             rounded-lg flex items-center justify-center space-x-2 hover:opacity-90 transition-all 
-            duration-300 hover:-translate-y-0.5 text-xs sm:text-sm"
+            duration-300 hover:-translate-y-0.5 text-sm"
         >
-          <Navigation className="w-4 h-4 sm:w-5 sm:h-5" />
+          <Navigation className="w-5 h-5" />
           <span>Get Directions</span>
         </a>
+      </div>
+
+      {/* Image Column */}
+      <div className="relative h-[400px] lg:h-auto">
+        <div className="relative h-full">
+          <Slider {...sliderSettings} className="h-full">
+            {store.images.map((image, index) => (
+              <div key={index} className="relative h-[400px] lg:h-full">
+                <Image
+                  src={image.url}
+                  alt={image.caption}
+                  fill
+                  className="object-cover cursor-pointer transition-transform duration-300 hover:scale-105"
+                  onClick={() => setModalImage(image)}
+                />
+                <div
+                  className="absolute bottom-4 left-4 bg-sky-500/50 backdrop-blur-sm 
+                  text-white px-3 py-1.5 rounded-full text-sm"
+                >
+                  {image.caption}
+                </div>
+                <button
+                  onClick={() => setModalImage(image)}
+                  className="absolute bottom-4 right-4 bg-sky-500/50 hover:bg-sky-500/75 
+                  text-white p-2 rounded-full transition-all duration-300 hover:scale-110"
+                >
+                  <ZoomIn className="w-5 h-5" />
+                </button>
+              </div>
+            ))}
+          </Slider>
+        </div>
       </div>
     </div>
   );
@@ -268,25 +239,24 @@ const StoreLocator = () => {
     <div className="min-h-screen bg-white pt-6 sm:pt-20 md:pt-24 pb-8 sm:pb-12 md:pb-16">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-8 sm:mb-12">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-sky-900 mb-3 sm:mb-4">
-            Visit Our Stores
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-sky-900 mb-4">
+            Our Store Locations
           </h1>
-          <p className="text-sm sm:text-base text-sky-700 max-w-2xl mx-auto">
-            Experience our premium cycle collection at any of our two locations
-            in Aurangabad
+          <p className="text-base text-sky-700 max-w-2xl mx-auto">
+            Discover our premium cycle collection at our carefully curated
+            stores in Aurangabad
           </p>
         </div>
 
         {/* Store Cards Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+        <div className="space-y-8">
           {stores.map((store) => (
             <motion.div
               key={store.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="w-full"
             >
               <StoreCard store={store} />
             </motion.div>

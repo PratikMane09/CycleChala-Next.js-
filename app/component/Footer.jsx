@@ -81,6 +81,7 @@ const Footer = () => {
   return (
     <footer className="relative bg-white pt-16 pb-6 overflow-hidden">
       {/* Background Gradients */}
+
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-blue-500/5 rounded-full filter blur-[120px] transform -translate-x-1/2 -translate-y-1/2" />
         <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-purple-500/5 rounded-full filter blur-[120px] transform translate-x-1/2 translate-y-1/2" />

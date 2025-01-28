@@ -25,14 +25,14 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const lowercaseEmail = email.toLowerCase(); // Convert email to lowercase
       const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: lowercaseEmail, password }), // Send lowercase email
       });
-
       const data = await response.json();
 
       if (!response.ok) {
@@ -60,12 +60,13 @@ const LoginForm = () => {
   const handleForgotPassword = async (e) => {
     e.preventDefault();
     try {
+      const lowercaseEmail = email.toLowerCase(); // Convert email to lowercase
       const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: lowercaseEmail }), // Send lowercase email
       });
 
       const data = await response.json();
@@ -75,7 +76,7 @@ const LoginForm = () => {
       }
 
       // Redirect to OTP verification page
-      window.location.href = `/reset-password?email=${encodeURIComponent(
+      window.location.href = `/resetpassword?email=${encodeURIComponent(
         email
       )}`;
     } catch (error) {
