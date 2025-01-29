@@ -120,7 +120,7 @@ const Header = () => {
             className="flex items-center gap-2 no-underline shrink-0"
           >
             <span className="text-2xl font-bold text-gray-900">Cycle</span>
-            <span className="text-xl text-gray-700">Service</span>
+            <span className="text-xl text-gray-700">Chala</span>
           </Link>
 
           <div className="hidden lg:flex gap-12">
@@ -442,7 +442,7 @@ const Header = () => {
                   className="h-8 w-8"
                 />
                 <span className="text-xl font-semibold text-gray-900">
-                  Company Name
+                  CycleChala
                 </span>
               </div>
               <IconButton
