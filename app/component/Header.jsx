@@ -119,8 +119,8 @@ const Header = () => {
             href="/"
             className="flex items-center gap-2 no-underline shrink-0"
           >
-            <span className="text-2xl font-bold text-gray-900">Cycle</span>
-            <span className="text-xl text-gray-700">Chala</span>
+            <span className="text-2xl font-bold text-gray-900">CycleChala</span>
+            {/* <span className="text-xl text-gray-700">Chala</span> */}
           </Link>
 
           <div className="hidden lg:flex gap-12">

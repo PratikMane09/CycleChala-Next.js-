@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -8,112 +7,70 @@ import {
   Mail,
   Send,
   Facebook,
-  Twitter,
   Instagram,
-  Linkedin,
+  Twitter,
   Clock,
+  Bike,
   ChevronRight,
+  Wrench,
 } from "lucide-react";
 
 const ContactPage = () => {
-  // Form state management
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
+    subject: "",
     message: "",
   });
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Add form submission logic here
     console.log(formData);
   };
 
-  const socialLinks = [
-    {
-      name: "Facebook",
-      url: "#",
-      icon: Facebook,
-      color: "from-blue-600 to-blue-700",
-      ariaLabel: "Visit our Facebook page",
-    },
-    {
-      name: "Instagram",
-      url: "#",
-      icon: Instagram,
-      color: "from-pink-600 to-pink-700",
-      ariaLabel: "Follow us on Instagram",
-    },
-    {
-      name: "LinkedIn",
-      url: "#",
-      icon: Linkedin,
-      color: "from-sky-600 to-sky-700",
-      ariaLabel: "Connect with us on LinkedIn",
-    },
-    {
-      name: "Twitter",
-      url: "#",
-      icon: Twitter,
-      color: "from-cyan-600 to-cyan-700",
-      ariaLabel: "Follow us on Twitter",
-    },
-  ];
-
   const contactInfo = [
     {
-      icon: MapPin,
-      title: "Our Location",
-      content: "Garkheda parisar Aurangabad",
-      gradient: "from-blue-500 to-sky-600",
-      ariaLabel: "Company location",
+      icon: Bike,
+      title: "Test Ride Hours",
+      content: "Mon - Sat: 9 AM - 6 PM",
+      gradient: "from-orange-500 to-red-600",
+    },
+    {
+      icon: Wrench,
+      title: "Service Center",
+      content: "Available 7 Days a Week",
+      gradient: "from-purple-500 to-indigo-600",
     },
     {
       icon: Phone,
-      title: "Phone Number",
-      content: "+91 7038698440",
+      title: "Emergency Service",
+      content: "+1 (555) 123-4567",
       gradient: "from-green-500 to-emerald-600",
-      ariaLabel: "Contact phone number",
     },
     {
       icon: Mail,
-      title: "Email Address",
-      content: "pravinmane111@gmail.com",
-      gradient: "from-sky-500 to-blue-600",
-      ariaLabel: "Contact email address",
-    },
-    {
-      icon: Clock,
-      title: "Working Hours",
-      content: "Mon - Sun, 7:00 AM - 9:00 PM",
-      gradient: "from-indigo-500 to-purple-600",
-      ariaLabel: "Business working hours",
+      title: "Email Support",
+      content: "support@cycleshop.com",
+      gradient: "from-blue-500 to-sky-600",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 pt-24 pb-16">
-      <div className="container mx-auto px-4">
-        {/* Header */}
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <div className="container mx-auto px-4 py-16">
+        {/* Header Section */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-6">
             Get in Touch
           </h1>
-          <p className="text-gray-700 max-w-2xl mx-auto text-lg">
-            Have questions? We would love to hear from you. Send us a message
-            and we will respond as soon as possible.
+          <p className="text-gray-600 text-xl max-w-2xl mx-auto leading-relaxed">
+            Whether you need a bike fitting, service appointment, or just want
+            to talk about bikes, we are here to help you get rolling.
           </p>
         </motion.div>
 
@@ -125,17 +82,18 @@ const ContactPage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="bg-white rounded-xl p-6 shadow-md border border-gray-200"
-              aria-label={info.ariaLabel}
+              className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300"
             >
               <div
-                className={`w-12 h-12 rounded-full bg-gradient-to-r ${info.gradient} 
-                flex items-center justify-center mb-4`}
+                className={`w-14 h-14 rounded-full bg-gradient-to-r ${info.gradient} 
+                flex items-center justify-center mb-4 transform hover:scale-105 transition-transform`}
               >
-                <info.icon className="w-6 h-6 text-white" />
+                <info.icon className="w-7 h-7 text-white" />
               </div>
-              <h3 className="text-gray-900 font-semibold mb-2">{info.title}</h3>
-              <p className="text-gray-700">{info.content}</p>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">
+                {info.title}
+              </h3>
+              <p className="text-gray-600">{info.content}</p>
             </motion.div>
           ))}
         </div>
@@ -145,83 +103,76 @@ const ContactPage = () => {
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="bg-white rounded-2xl p-6 md:p-8 shadow-md border border-gray-200"
+            className="bg-white rounded-2xl p-8 shadow-lg"
           >
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              Send Message
+            <h2 className="text-3xl font-bold text-gray-800 mb-6">
+              Send Us a Message
             </h2>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Your Name
-                </label>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg 
-                    focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent
-                    text-gray-900 placeholder-gray-500"
-                  placeholder="John Doe"
-                  aria-required="true"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="text-gray-700 font-medium mb-2 block">
+                    Your Name
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="John Doe"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-gray-700 font-medium mb-2 block">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="+1 (555) 000-0000"
+                  />
+                </div>
               </div>
 
               <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
+                <label className="text-gray-700 font-medium mb-2 block">
                   Email Address
                 </label>
                 <input
-                  id="email"
-                  name="email"
                   type="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg 
-                    focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent
-                    text-gray-900 placeholder-gray-500"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="john@example.com"
-                  aria-required="true"
+                  required
                 />
               </div>
 
               <div>
-                <label
-                  htmlFor="message"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
+                <label className="text-gray-700 font-medium mb-2 block">
+                  Subject
+                </label>
+                <select className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <option value="">Select a subject</option>
+                  <option value="service">Bike Service</option>
+                  <option value="purchase">New Purchase</option>
+                  <option value="test-ride">Test Ride</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-gray-700 font-medium mb-2 block">
                   Message
                 </label>
                 <textarea
-                  id="message"
-                  name="message"
                   rows={6}
-                  value={formData.message}
-                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  placeholder="Tell us what you need..."
                   required
-                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg 
-                    focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent
-                    text-gray-900 placeholder-gray-500 resize-none"
-                  placeholder="Your message..."
-                  aria-required="true"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-sky-500 to-blue-600 text-white 
-                  py-3 px-6 rounded-lg font-semibold hover:opacity-90 transition-opacity
-                  flex items-center justify-center space-x-2 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-lg font-bold text-lg hover:opacity-90 transition-opacity flex items-center justify-center space-x-2"
               >
                 <Send className="w-5 h-5" />
                 <span>Send Message</span>
@@ -229,50 +180,44 @@ const ContactPage = () => {
             </form>
           </motion.div>
 
-          {/* Social Links & Map */}
+          {/* Map and Hours */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             className="space-y-8"
           >
-            {/* Social Links */}
-            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-md border border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                Follow Us
+            {/* Store Hours */}
+            <div className="bg-white rounded-2xl p-8 shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6">
+                Store Hours
               </h2>
-              <div className="grid grid-cols-2 gap-4">
-                {socialLinks.map((social, index) => (
-                  <a
+              <div className="space-y-4">
+                {[
+                  { day: "Monday - Friday", hours: "9:00 AM - 8:00 PM" },
+                  { day: "Saturday", hours: "10:00 AM - 6:00 PM" },
+                  { day: "Sunday", hours: "11:00 AM - 5:00 PM" },
+                ].map((schedule, index) => (
+                  <div
                     key={index}
-                    href={social.url}
-                    aria-label={social.ariaLabel}
-                    className="group relative focus:outline-none"
+                    className="flex justify-between items-center py-2 border-b border-gray-200"
                   >
-                    <div
-                      className={`
-                      p-4 rounded-xl bg-gradient-to-r ${social.color}
-                      flex items-center space-x-3
-                      hover:opacity-90 transition-opacity
-                      focus:ring-2 focus:ring-white focus:ring-offset-2
-                    `}
-                    >
-                      <social.icon className="w-5 h-5 text-white" />
-                      <span className="text-white font-medium">
-                        {social.name}
-                      </span>
-                      <ChevronRight className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div>
-                  </a>
+                    <span className="text-gray-600 font-medium">
+                      {schedule.day}
+                    </span>
+                    <span className="text-gray-800 font-bold">
+                      {schedule.hours}
+                    </span>
+                  </div>
                 ))}
               </div>
             </div>
 
             {/* Map */}
-            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-md border border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                Store Location
+            <div className="bg-white rounded-2xl p-8 shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6">
+                Visit Our Store
               </h2>
-              <div className="aspect-video w-full rounded-lg overflow-hidden shadow-sm">
+              <div className="aspect-video w-full rounded-lg overflow-hidden shadow-md">
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3752.238627665032!2d75.33083287497447!3d19.876561881483828!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bdb98d86a28080d%3A0x5c0c90e11f35aeca!2sGarkheda%2C%20Aurangabad%2C%20Maharashtra!5e0!3m2!1sen!2sin!4v1700298416941!5m2!1sen!2sin"
                   width="100%"
@@ -281,8 +226,14 @@ const ContactPage = () => {
                   allowFullScreen=""
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
-                  title="Company Location Map"
+                  title="Cycle Shop Location"
                 />
+              </div>
+              <div className="mt-4 flex items-start space-x-3">
+                <MapPin className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+                <p className="text-gray-600">
+                  123 Bike Street, Garkheda, Aurangabad, Maharashtra, India
+                </p>
               </div>
             </div>
           </motion.div>
