@@ -73,7 +73,20 @@ const Header = () => {
   const { count: cartcount } = useCart();
 
   const router = useRouter();
+  const pathname = usePathname();
   const isActive = useActiveLink();
+
+  // Close menus on route change
+  useEffect(() => {
+    setMobileMenu(false);
+    setIsMenuOpen(false);
+  }, [pathname]);
+
+  // Handle mobile auth navigation
+  const handleAuthNavigation = (path) => {
+    setMobileMenu(false);
+    router.push(path);
+  };
 
   const navLinks = [
     { path: "/", display: "Home" },
@@ -375,8 +388,7 @@ const Header = () => {
                         fullWidth
                         variant="outlined"
                         startIcon={<LogIn size={18} />}
-                        component={Link}
-                        href="/login"
+                        onClick={() => handleAuthNavigation("/login")}
                         sx={{
                           height: "48px",
                           color: "#0284c7",
@@ -392,8 +404,7 @@ const Header = () => {
                         fullWidth
                         variant="contained"
                         startIcon={<User size={18} />}
-                        component={Link}
-                        href="/register"
+                        onClick={() => handleAuthNavigation("/register")}
                         sx={{
                           height: "48px",
                           backgroundColor: "#0284c7",
