@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronDown, ChevronUp, Star, Filter, Loader } from "lucide-react";
 import FilterSidebar from "./FilterSidebar";
 import { useSearchParams } from "next/navigation";
@@ -103,7 +103,6 @@ const ShopContent = () => {
             <div className="flex mt-2 justify-center items-center h-64">
               <div className="flex flex-col items-center gap-4">
                 <Loader className="w-8 h-8 text-sky-600 animate-spin" />
-                <p className="text-gray-600">Loading products...</p>
               </div>
             </div>
           ) : (

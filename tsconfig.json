@@ -34,7 +34,7 @@
     "app/product/page.js",
     "app/login/page.js",
     "app/shipping/page.js",
-    "app/shop/page.jsx"
+    "app/shop/page.js"
   ],
   "exclude": ["node_modules"]
 }
