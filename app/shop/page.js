@@ -2,7 +2,7 @@
 "use client";
 
 import React, { Suspense } from "react";
-import ShopContent from "./component/ShopContent";
+import ShopContent from "./compoenent/ShopContent";
 
 function LoadingFallback() {
   return (
