@@ -92,9 +92,11 @@ const ShopContent = () => {
         </div>
 
         <div className="p-8">
-          <div className="mt-10">
-            <h1 className="text-2xl font-bold text-gray-900">Our Products</h1>
-            <p className="text-gray-600 mt-2">
+          <div className="mt-10 text-center">
+            <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 tracking-tight">
+              Our Products
+            </h1>
+            <p className="text-gray-600 mt-2 font-normal leading-relaxed max-w-2xl mx-auto">
               Discover our collection of high-quality cycles
             </p>
           </div>
