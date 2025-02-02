@@ -210,246 +210,218 @@ const RegisterForm = () => {
   );
 
   return (
-    <>
-      <div className="h-[800px]    bg-gradient-to-br from-sky-50 via-white to-sky-50 flex items-center justify-center">
-        {" "}
-        <div className="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Paper elevation={3} className="overflow-hidden rounded-2xl">
-            <div className="flex flex-col lg:flex-row">
-              {/* Left Column - Image */}
-              <div className="w-full lg:w-1/2 hidden md:block relative bg-sky-500">
-                <div className="absolute inset-0 bg-black bg-opacity-20" />
-                <div className="h-full flex flex-col justify-center p-3 relative z-10">
-                  <img
-                    src="/Images/cycling-hero.jpg"
-                    alt="Cyclist in action"
-                    className="rounded-xl object-cover w-full h-44 lg:h-auto shadow-lg mb-6"
-                  />
-                  <div className="text-white">
-                    <Typography variant="h4" className="font-bold mb-4">
-                      Join Our Cycling Community
-                    </Typography>
-                    <Typography variant="h6" className="opacity-90">
-                      Connect with fellow cyclists, track your rides, and
-                      discover new adventures
-                    </Typography>
-                  </div>
-                </div>
+    <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-sky-50 flex items-center justify-center py-6 sm:py-8 px-4 sm:px-6">
+      <Paper elevation={3} className="w-full max-w-5xl mx-auto rounded-2xl">
+        <div className="flex flex-col lg:flex-row">
+          {/* Left Column - Image */}
+          <div className="hidden lg:block w-1/2 relative bg-sky-500">
+            <div className="absolute inset-0 bg-black bg-opacity-20" />
+            <div className="h-full flex flex-col justify-center p-4 sm:p-6 relative z-10">
+              <img
+                src="/Images/cycling-hero.jpg"
+                alt="Cyclist in action"
+                className="rounded-xl object-cover w-full h-44 lg:h-auto shadow-lg mb-6"
+              />
+              <div className="text-white space-y-2">
+                <Typography className="text-2xl sm:text-3xl font-bold">
+                  Join Our Cycling Community
+                </Typography>
+                <Typography className="text-sm sm:text-base opacity-90">
+                  Connect with fellow cyclists, track your rides, and discover
+                  new adventures
+                </Typography>
               </div>
+            </div>
+          </div>
 
-              {/* Right Column - Form */}
-              <div className="w-full h-full  lg:w-1/2 bg-white p-8 pb-10 flex flex-col justify-center">
-                <div className="max-w-md mx-auto w-full">
-                  {error && <Alert className="mb-4">{error}</Alert>}
+          {/* Right Column - Form */}
+          <div className="w-full lg:w-1/2 bg-white p-4 sm:p-6 lg:p-8">
+            <div className="max-w-md mx-auto w-full space-y-6">
+              {error && (
+                <Alert severity="error" className="text-sm sm:text-base">
+                  {error}
+                </Alert>
+              )}
+              {success && (
+                <Alert severity="success" className="text-sm sm:text-base">
+                  {success}
+                </Alert>
+              )}
 
-                  {success && (
-                    <Alert className="mb-4 bg-green-50 text-green-800 border-green-200">
-                      {success}
-                    </Alert>
-                  )}
-
-                  <div className="flex flex-col items-center mb-8">
-                    <div className="bg-sky-100 p-3 rounded-full mb-4">
-                      <Bike className="h-8 w-8 text-sky-500" />
-                    </div>
-                    <Typography
-                      variant="h4"
-                      className="text-center font-bold text-gray-900"
-                    >
-                      {showOtpInput ? "Verify Email" : "Create Account"}
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      className="text-center text-gray-600 mt-2"
-                    >
-                      {showOtpInput
-                        ? "Enter the verification code sent to your email"
-                        : "Start your cycling journey today"}
-                    </Typography>
-                  </div>
-
-                  <form
-                    onSubmit={
-                      showOtpInput ? handleVerifyOtp : handleInitiateRegister
-                    }
-                    className="space-y-4"
-                  >
-                    {!showOtpInput ? (
-                      <>
-                        <Button
-                          fullWidth
-                          variant="outlined"
-                          className="py-2.5 mb-6 border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition-colors duration-200 normal-case flex items-center justify-center"
-                          onClick={() => {
-                            /* Add Google sign-in handler */
-                          }}
-                        >
-                          <GoogleIcon />
-                          Continue with Google
-                        </Button>
-                        <div className="relative mb-6">
-                          <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-gray-300"></div>
-                          </div>
-                          <div className="relative flex justify-center text-sm">
-                            <span className="px-2 bg-white text-gray-500">
-                              Or continue with
-                            </span>
-                          </div>
-                        </div>
-                        <TextField
-                          fullWidth
-                          required
-                          id="name"
-                          label="Full Name"
-                          variant="outlined"
-                          value={formData.name}
-                          onChange={handleChange}
-                          error={Boolean(formErrors.name)}
-                          helperText={formErrors.name}
-                          placeholder="John Doe"
-                          size="small"
-                          InputProps={{
-                            startAdornment: (
-                              <InputAdornment position="start">
-                                <User className="h-5 w-5 text-sky-500" />
-                              </InputAdornment>
-                            ),
-                          }}
-                        />
-
-                        <TextField
-                          fullWidth
-                          required
-                          id="email"
-                          label="Email Address"
-                          type="email"
-                          variant="outlined"
-                          value={formData.email}
-                          onChange={handleChange}
-                          error={Boolean(formErrors.email)}
-                          helperText={formErrors.email}
-                          placeholder="you@example.com"
-                          size="small"
-                          InputProps={{
-                            startAdornment: (
-                              <InputAdornment position="start">
-                                <Mail className="h-5 w-5 text-sky-500" />
-                              </InputAdornment>
-                            ),
-                          }}
-                        />
-
-                        <TextField
-                          fullWidth
-                          required
-                          id="phone"
-                          label="Phone Number"
-                          type="tel"
-                          variant="outlined"
-                          value={formData.phone}
-                          onChange={handleChange}
-                          error={Boolean(formErrors.phone)}
-                          helperText={formErrors.phone}
-                          placeholder="+1 (555) 000-0000"
-                          size="small"
-                          InputProps={{
-                            startAdornment: (
-                              <InputAdornment position="start">
-                                <Phone className="h-5 w-5 text-sky-500" />
-                              </InputAdornment>
-                            ),
-                          }}
-                        />
-
-                        <TextField
-                          fullWidth
-                          required
-                          id="password"
-                          label="Password"
-                          type={showPassword ? "text" : "password"}
-                          variant="outlined"
-                          value={formData.password}
-                          onChange={handleChange}
-                          error={Boolean(formErrors.password)}
-                          helperText={formErrors.password}
-                          placeholder="••••••••"
-                          size="small"
-                          InputProps={{
-                            startAdornment: (
-                              <InputAdornment position="start">
-                                <Lock className="h-5 w-5 text-sky-500" />
-                              </InputAdornment>
-                            ),
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <IconButton
-                                  onClick={() => setShowPassword(!showPassword)}
-                                  edge="end"
-                                  size="small"
-                                >
-                                  {showPassword ? (
-                                    <EyeOff className="h-5 w-5 text-gray-400" />
-                                  ) : (
-                                    <Eye className="h-5 w-5 text-gray-400" />
-                                  )}
-                                </IconButton>
-                              </InputAdornment>
-                            ),
-                          }}
-                        />
-                      </>
-                    ) : (
-                      <TextField
-                        fullWidth
-                        required
-                        id="otp"
-                        label="Verification Code"
-                        variant="outlined"
-                        value={formData.otp}
-                        onChange={handleChange}
-                        error={Boolean(formErrors.otp)}
-                        helperText={formErrors.otp}
-                        placeholder="Enter 6-digit code"
-                        size="small"
-                      />
-                    )}
-
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      fullWidth
-                      disabled={isLoading}
-                      className="bg-sky-500 hover:bg-sky-600 py-2.5 text-white font-medium rounded-lg transition-colors duration-200 mt-6"
-                    >
-                      {isLoading
-                        ? "Please wait..."
-                        : showOtpInput
-                        ? "Verify Code"
-                        : "Join the Community"}
-                    </Button>
-                  </form>
-
-                  <Typography
-                    variant="body2"
-                    className="text-center mt-6 text-gray-600"
-                  >
-                    Already a member?{" "}
-                    <a
-                      href="/login"
-                      className="font-medium text-sky-600 hover:text-sky-500 transition-colors duration-200"
-                    >
-                      Sign in
-                    </a>
+              <div className="text-center space-y-4">
+                <div className="bg-sky-100 p-2 sm:p-3 rounded-full inline-block">
+                  <Bike className="h-6 w-6 sm:h-8 sm:w-8 text-sky-500" />
+                </div>
+                <div className="space-y-2">
+                  <Typography className="text-xl sm:text-2xl font-bold text-gray-900">
+                    {showOtpInput ? "Verify Email" : "Create Account"}
+                  </Typography>
+                  <Typography className="text-sm sm:text-base text-gray-600">
+                    {showOtpInput
+                      ? "Enter the verification code sent to your email"
+                      : "Start your cycling journey today"}
                   </Typography>
                 </div>
               </div>
+
+              <form
+                onSubmit={
+                  showOtpInput ? handleVerifyOtp : handleInitiateRegister
+                }
+                className="space-y-4"
+              >
+                {!showOtpInput ? (
+                  <>
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      className="py-2 sm:py-2.5 border-gray-300 hover:bg-gray-50 text-gray-700 text-sm sm:text-base font-medium rounded-lg"
+                      onClick={() => {
+                        /* Add Google sign-in handler */
+                      }}
+                    >
+                      <GoogleIcon />
+                      <span className="ml-2">Continue with Google</span>
+                    </Button>
+
+                    <div className="relative my-6">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-300"></div>
+                      </div>
+                      <div className="relative flex justify-center">
+                        <span className="px-2 bg-white text-xs sm:text-sm text-gray-500">
+                          Or continue with
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Form Fields with responsive styling */}
+                    {[
+                      {
+                        id: "name",
+                        label: "Full Name",
+                        icon: (
+                          <User className="h-4 w-4 sm:h-5 sm:w-5 text-sky-500" />
+                        ),
+                        type: "text",
+                        placeholder: "John Doe",
+                      },
+                      {
+                        id: "email",
+                        label: "Email Address",
+                        icon: (
+                          <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-sky-500" />
+                        ),
+                        type: "email",
+                        placeholder: "you@example.com",
+                      },
+                      {
+                        id: "phone",
+                        label: "Phone Number",
+                        icon: (
+                          <Phone className="h-4 w-4 sm:h-5 sm:w-5 text-sky-500" />
+                        ),
+                        type: "tel",
+                        placeholder: "+1 (555) 000-0000",
+                      },
+                      {
+                        id: "password",
+                        label: "Password",
+                        icon: (
+                          <Lock className="h-4 w-4 sm:h-5 sm:w-5 text-sky-500" />
+                        ),
+                        type: showPassword ? "text" : "password",
+                        placeholder: "••••••••",
+                        hasPasswordToggle: true,
+                      },
+                    ].map((field) => (
+                      <TextField
+                        key={field.id}
+                        fullWidth
+                        required
+                        id={field.id}
+                        label={field.label}
+                        type={field.type}
+                        value={formData[field.id]}
+                        onChange={handleChange}
+                        error={Boolean(formErrors[field.id])}
+                        helperText={formErrors[field.id]}
+                        placeholder={field.placeholder}
+                        size="small"
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              {field.icon}
+                            </InputAdornment>
+                          ),
+                          endAdornment: field.hasPasswordToggle && (
+                            <InputAdornment position="end">
+                              <IconButton
+                                onClick={() => setShowPassword(!showPassword)}
+                                edge="end"
+                                size="small"
+                              >
+                                {showPassword ? (
+                                  <EyeOff className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
+                                ) : (
+                                  <Eye className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
+                                )}
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                          className: "text-sm sm:text-base",
+                        }}
+                        className="bg-white"
+                      />
+                    ))}
+                  </>
+                ) : (
+                  <TextField
+                    fullWidth
+                    required
+                    id="otp"
+                    label="Verification Code"
+                    value={formData.otp}
+                    onChange={handleChange}
+                    error={Boolean(formErrors.otp)}
+                    helperText={formErrors.otp}
+                    placeholder="Enter 6-digit code"
+                    size="small"
+                    InputProps={{
+                      className: "text-sm sm:text-base",
+                    }}
+                  />
+                )}
+
+                <Button
+                  type="submit"
+                  variant="contained"
+                  fullWidth
+                  disabled={isLoading}
+                  className="bg-sky-500 hover:bg-sky-600 py-2 sm:py-2.5 text-sm sm:text-base font-medium rounded-lg mt-6"
+                >
+                  {isLoading
+                    ? "Please wait..."
+                    : showOtpInput
+                    ? "Verify Code"
+                    : "Join the Community"}
+                </Button>
+              </form>
+
+              <Typography className="text-center text-sm sm:text-base text-gray-600">
+                Already a member?{" "}
+                <a
+                  href="/login"
+                  className="font-medium text-sky-600 hover:text-sky-500"
+                >
+                  Sign in
+                </a>
+              </Typography>
             </div>
-          </Paper>
+          </div>
         </div>
-      </div>
-    </>
+      </Paper>
+    </div>
   );
 };
-
 export default RegisterForm;

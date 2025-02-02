@@ -112,197 +112,188 @@ const LoginForm = () => {
   };
 
   return (
-    <>
-      <div className="min-h-screen h-[450px] mt-10 bg-gradient-to-br from-sky-50 via-white to-sky-50 flex items-center justify-center  px-4 sm:px-6 lg:px-8">
-        <Paper
-          elevation={3}
-          className="max-w-5xl w-full mx-auto overflow-hidden rounded-2xl"
-        >
-          <div className="flex flex-col md:flex-row">
-            {/* Left Side - Form */}
-            <div className="w-full md:w-1/2 p-6 lg:p-10">
-              <div className="flex flex-col max-w-md mx-auto">
-                <div className="flex items-center justify-center space-x-1 mb-4">
+    <div className="min-h-screen py-8 sm:py-12 bg-gradient-to-br from-sky-50 via-white to-sky-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+      <Paper elevation={3} className="w-full max-w-5xl mx-auto rounded-2xl">
+        <div className="flex flex-col md:flex-row">
+          {/* Left Side - Form */}
+          <div className="w-full md:w-1/2 p-4 sm:p-6 lg:p-8">
+            <div className="flex flex-col max-w-md mx-auto space-y-6">
+              {/* Logo and Title */}
+              <div className="text-center space-y-4">
+                <div className="flex items-center justify-center space-x-2">
                   <div className="bg-sky-100 p-2 rounded-lg">
-                    <Bike className="h-6 w-6 text-sky-600" />
+                    <Bike className="h-5 w-5 sm:h-6 sm:w-6 text-sky-600" />
                   </div>
-                  <Typography variant="h5" className="font-bold text-gray-900">
+                  <Typography className="text-lg sm:text-xl font-bold text-gray-900">
                     CycleChala
                   </Typography>
                 </div>
-
-                <Typography
-                  variant="h4"
-                  className="text-center font-bold text-gray-900 mb-1"
-                >
-                  Welcome Back!
-                </Typography>
-                <Typography
-                  variant="body1"
-                  className="text-center text-gray-600 mb-6"
-                >
-                  Continue your cycling journey
-                </Typography>
-
-                {error && (
-                  <Typography color="error" className="text-center mb-4">
-                    {error}
+                <div className="space-y-2">
+                  <Typography className="text-2xl sm:text-3xl font-bold text-gray-900">
+                    Welcome Back!
                   </Typography>
-                )}
+                  <Typography className="text-sm sm:text-base text-gray-600">
+                    Continue your cycling journey
+                  </Typography>
+                </div>
+              </div>
 
-                {/* Google Sign In Button */}
-                <Button
+              {error && (
+                <Typography color="error" className="text-center text-sm">
+                  {error}
+                </Typography>
+              )}
+
+              {/* Google Sign In Button */}
+              <Button
+                fullWidth
+                variant="outlined"
+                className="py-2 sm:py-2.5 border-gray-300 hover:bg-gray-50 text-gray-700 text-sm sm:text-base font-medium rounded-lg"
+                onClick={handleGoogleSignIn}
+              >
+                <GoogleIcon />
+                <span className="ml-2">Continue with Google</span>
+              </Button>
+
+              {/* Divider */}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300"></div>
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="px-2 bg-white text-xs sm:text-sm text-gray-500">
+                    Or continue with
+                  </span>
+                </div>
+              </div>
+
+              {/* Login Form */}
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <TextField
                   fullWidth
-                  variant="outlined"
-                  className="py-2.5 mb-6 border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition-colors duration-200 normal-case flex items-center justify-center"
-                  onClick={() => {
-                    /* Add Google sign-in handler */
+                  required
+                  label="Email Address"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-sky-500" />
+                      </InputAdornment>
+                    ),
+                    className: "text-sm sm:text-base",
                   }}
-                >
-                  <GoogleIcon />
-                  Continue with Google
-                </Button>
-                <div className="relative mb-6">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-300"></div>
-                  </div>
-                  <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-white text-gray-500">
-                      Or continue with
-                    </span>
-                  </div>
+                  className="bg-white"
+                />
+
+                <TextField
+                  fullWidth
+                  required
+                  label="Password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Lock className="h-4 w-4 sm:h-5 sm:w-5 text-sky-500" />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setShowPassword(!showPassword)}
+                          edge="end"
+                          size="small"
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
+                          ) : (
+                            <Eye className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                    className: "text-sm sm:text-base",
+                  }}
+                />
+
+                <div className="flex items-center justify-between text-sm sm:text-base">
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={rememberMe}
+                        onChange={(e) => setRememberMe(e.target.checked)}
+                        className="text-sky-500"
+                        size="small"
+                      />
+                    }
+                    label={
+                      <span className="text-sm sm:text-base">Remember me</span>
+                    }
+                  />
+                  <button
+                    onClick={handleForgotPassword}
+                    className="text-sm sm:text-base font-medium text-sky-600 hover:text-sky-500"
+                  >
+                    Forgot password?
+                  </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <TextField
-                    fullWidth
-                    required
-                    id="email"
-                    label="Email Address"
-                    type="email"
-                    variant="outlined"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@example.com"
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Mail className="h-5 w-5 text-sky-500" />
-                        </InputAdornment>
-                      ),
-                    }}
-                    className="bg-white"
-                  />
-
-                  <TextField
-                    fullWidth
-                    required
-                    id="password"
-                    label="Password"
-                    type={showPassword ? "text" : "password"}
-                    variant="outlined"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Lock className="h-5 w-5 text-sky-500" />
-                        </InputAdornment>
-                      ),
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            onClick={() => setShowPassword(!showPassword)}
-                            edge="end"
-                          >
-                            {showPassword ? (
-                              <EyeOff className="h-5 w-5 text-gray-400" />
-                            ) : (
-                              <Eye className="h-5 w-5 text-gray-400" />
-                            )}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-
-                  <div className="flex items-center justify-between">
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={rememberMe}
-                          onChange={(e) => setRememberMe(e.target.checked)}
-                          className="text-sky-500"
-                        />
-                      }
-                      label="Remember me"
-                    />
-                    <button
-                      onClick={handleForgotPassword}
-                      className="text-sm font-medium text-sky-600 hover:text-sky-500"
-                    >
-                      Forgot password?
-                    </button>
-                  </div>
-
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    fullWidth
-                    className="bg-sky-500 hover:bg-sky-600 py-3 text-white font-medium rounded-lg transition-colors duration-200"
-                    endIcon={<ArrowRight className="h-5 w-5" />}
-                  >
-                    Sign In
-                  </Button>
-                </form>
-
-                <Typography
-                  variant="body2"
-                  className="text-center mt-6 text-gray-600"
+                <Button
+                  type="submit"
+                  variant="contained"
+                  fullWidth
+                  className="bg-sky-500 hover:bg-sky-600 py-2.5 sm:py-3 text-sm sm:text-base font-medium rounded-lg"
+                  endIcon={<ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />}
                 >
-                  Do not have an account?{" "}
-                  <a
-                    href="/register"
-                    className="font-medium text-sky-600 hover:text-sky-500 transition-colors duration-200"
-                  >
-                    Sign up
-                  </a>
-                </Typography>
-              </div>
-            </div>
+                  Sign In
+                </Button>
+              </form>
 
-            {/* Right Side - Image */}
-            <div className="hidden md:block w-1/2 bg-sky-500 relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-sky-600 to-sky-400 opacity-90" />
-              <div className="h-full flex flex-col justify-center p-4 relative z-10">
-                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 text-white">
-                  <Typography variant="h4" className="font-bold mb-2">
-                    Cycling is more than just exercise - it is freedom on two
-                    wheels
-                  </Typography>
-                  <div className="flex items-center mt-6">
-                    <img
-                      src="/Images/cycling-hero.jpg"
-                      alt="User"
-                      className="h-12 w-12 rounded-full object-cover"
-                    />
-                    <div className="ml-4">
-                      <Typography variant="subtitle1" className="font-semibold">
-                        Pravin Mane
-                      </Typography>
-                      <Typography variant="body2" className="opacity-80">
-                        Shop Owner
-                      </Typography>
-                    </div>
+              <Typography className="text-center text-sm sm:text-base text-gray-600">
+                Do not have an account?{" "}
+                <a
+                  href="/register"
+                  className="font-medium text-sky-600 hover:text-sky-500"
+                >
+                  Sign up
+                </a>
+              </Typography>
+            </div>
+          </div>
+
+          {/* Right Side - Image */}
+          <div className="hidden md:block w-1/2 bg-sky-500 relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-sky-600 to-sky-400 opacity-90" />
+            <div className="h-full flex flex-col justify-center p-4 relative z-10">
+              <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 text-white">
+                <Typography variant="h4" className="font-bold mb-2">
+                  Cycling is more than just exercise - it is freedom on two
+                  wheels
+                </Typography>
+                <div className="flex items-center mt-6">
+                  <img
+                    src="/Images/cycling-hero.jpg"
+                    alt="User"
+                    className="h-12 w-12 rounded-full object-cover"
+                  />
+                  <div className="ml-4">
+                    <Typography variant="subtitle1" className="font-semibold">
+                      Pravin Mane
+                    </Typography>
+                    <Typography variant="body2" className="opacity-80">
+                      Shop Owner
+                    </Typography>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </Paper>
-      </div>
-    </>
+        </div>
+      </Paper>
+    </div>
   );
 };
 
