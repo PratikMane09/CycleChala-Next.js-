@@ -26,7 +26,7 @@ const ShopContent = () => {
           apiService.fetchCategories(1, 20),
           apiService.fetchProducts(filters),
         ]);
-
+        console.log("productsResponse", productsResponse);
         setCategories(categoriesResponse.categories);
         setProducts(productsResponse.data.products);
       } catch (error) {

@@ -9,7 +9,6 @@ import {
   Avatar,
   IconButton,
   Typography,
-  Paper,
   Badge,
   Tooltip,
   useMediaQuery,
@@ -24,64 +23,24 @@ import {
   ChevronLeft,
   ChevronRight,
   LayoutDashboard,
+  Bell,
+  Search,
+  LogOut,
+  User,
 } from "lucide-react";
 
 import { useRouter } from "next/navigation";
 import Categories from "./component/Categories";
 import Product from "./component/Product";
-const DashboardCard = ({ title, icon, count, onClick }) => (
-  <Paper
-    elevation={0}
-    onClick={onClick}
-    sx={{
-      p: 3,
-      borderRadius: 3,
-      border: "1px solid #E5E7EB",
-      cursor: "pointer",
-      transition: "all 0.3s ease",
-      "&:hover": {
-        transform: "translateY(-4px)",
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-        background: "#F8FAFC",
-      },
-    }}
-  >
-    <div className="flex items-center justify-between mb-4">
-      <Typography variant="h6" className="text-gray-800 font-semibold">
-        {title}
-      </Typography>
-      <div className="p-3 rounded-full bg-gradient-to-r from-blue-500 to-blue-600">
-        {React.cloneElement(icon, {
-          className: "text-white",
-          sx: { fontSize: 28 },
-        })}
-      </div>
-    </div>
-    <Typography variant="h4" className="font-bold text-gray-900">
-      {count?.toLocaleString()}
-    </Typography>
-    <Typography variant="body2" className="text-gray-500 mt-2">
-      Click to view details
-    </Typography>
-  </Paper>
-);
 
 const AdminDashboard = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [activePage, setActivePage] = useState("dashboard");
-  const [counts, setCounts] = useState({
-    students: 0,
-    owners: 0,
-    hostels: 0,
-    approvedHostels: 0,
-    approvedWishlist: 0,
-    pendingWishlist: 0,
-  });
   const [drawerOpen, setDrawerOpen] = useState(!isMobile);
-  const [isLoading, setIsLoading] = useState(true);
 
   const router = useRouter();
+
   useEffect(() => {
     setDrawerOpen(!isMobile);
   }, [isMobile]);
@@ -98,6 +57,7 @@ const AdminDashboard = () => {
 
   return (
     <Box className="flex h-screen overflow-hidden">
+      {/* Sidebar */}
       <Drawer
         variant={isMobile ? "temporary" : "permanent"}
         open={drawerOpen}
@@ -108,38 +68,39 @@ const AdminDashboard = () => {
           flexShrink: 0,
           "& .MuiDrawer-paper": {
             width: drawerOpen ? 280 : 80,
-            position: isMobile ? "fixed" : "relative",
+            position: isMobile ? "fixed" : "fixed",
             background: "#FFFFFF",
+            boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
             borderRight: "1px solid #E5E7EB",
             transition: "width 0.3s ease-in-out",
             overflowX: "hidden",
             padding: "16px 12px",
-            height: "100%",
-          },
-          "& .MuiBackdrop-root": {
-            backgroundColor: "rgba(0, 0, 0, 0.3)",
+            height: "h-full",
+            zIndex: 1000,
           },
         }}
       >
+        {/* Sidebar Content */}
         <Box className="flex flex-col h-full">
           <div className="flex justify-between items-center mb-8 px-2">
             {drawerOpen && (
-              <Typography variant="h6" className="font-bold text-blue-600">
+              <Typography
+                variant="h6"
+                className="font-bold text-blue-600 tracking-wider uppercase"
+              >
                 Admin Panel
               </Typography>
             )}
             <IconButton
               onClick={toggleDrawer}
               className="text-gray-600 hover:bg-gray-100 rounded-full"
-              sx={{
-                width: 40,
-                height: 40,
-              }}
+              sx={{ width: 40, height: 40 }}
             >
               {drawerOpen ? <ChevronLeft /> : <ChevronRight />}
             </IconButton>
           </div>
 
+          {/* Sidebar Menu Items */}
           <List className="flex-1 space-y-1 px-2">
             {sidebarItems.map((item) => (
               <Tooltip
@@ -155,40 +116,26 @@ const AdminDashboard = () => {
                     px: drawerOpen ? 3 : 1,
                     justifyContent: drawerOpen ? "flex-start" : "center",
                     mb: 0.5,
-                    "& .MuiListItemIcon-root": {
-                      minWidth: drawerOpen ? 48 : 80,
-                      justifyContent: "center",
-                      color: activePage === item.value ? "#2563EB" : "#64748B",
-                    },
-                    "& .MuiListItemText-primary": {
-                      color: activePage === item.value ? "#2563EB" : "#64748B",
-                      fontWeight: activePage === item.value ? 600 : 500,
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      backgroundColor: "rgba(37, 99, 235, 0.1)",
+                      transform: "translateX(4px)",
                     },
                     background:
                       activePage === item.value
                         ? "linear-gradient(90deg, #EEF2FF 0%, #BFDBFE 100%)"
                         : "transparent",
-                    "&:hover": {
-                      background:
-                        activePage === item.value
-                          ? "linear-gradient(90deg, #EEF2FF 0%, #BFDBFE 100%)"
-                          : "#F8FAFC",
-                    },
                   }}
                 >
-                  <ListItemIcon
-                    sx={{
-                      minWidth: drawerOpen ? 48 : "auto",
-                      mr: drawerOpen ? "auto" : 0,
-                    }}
-                  >
-                    {item.icon}
-                  </ListItemIcon>
+                  <ListItemIcon>{item.icon}</ListItemIcon>
                   {drawerOpen && (
                     <ListItemText
                       primary={item.name}
                       primaryTypographyProps={{
-                        fontSize: "0.85rem",
+                        fontSize: "0.95rem",
+                        fontWeight: activePage === item.value ? 600 : 400,
+                        color:
+                          activePage === item.value ? "#2563EB" : "#64748B",
                       }}
                     />
                   )}
@@ -196,37 +143,26 @@ const AdminDashboard = () => {
               </Tooltip>
             ))}
           </List>
+
+          {/* Logout Section */}
           <ListItem
             disablePadding
             sx={{
               mt: 2,
               borderRadius: "12px",
-              overflow: "hidden",
-              "& .MuiListItemIcon-root": {
-                minWidth: 48,
-                justifyContent: "center",
-                color: "#EF4444",
-              },
-              "& .MuiListItemText-primary": {
-                color: "#EF4444",
-                fontWeight: 500,
-              },
-              "&:hover": {
-                backgroundColor: "#FEE2E2",
-              },
+              "&:hover": { backgroundColor: "#FEE2E2" },
             }}
           >
-            <ListItemButton
-              sx={{
-                py: 2,
-              }}
-            >
-              <ListItemIcon></ListItemIcon>
+            <ListItemButton>
+              <ListItemIcon>
+                <LogOut className="text-red-500" />
+              </ListItemIcon>
               {drawerOpen && (
                 <ListItemText
                   primary="Logout"
                   primaryTypographyProps={{
                     fontSize: "0.95rem",
+                    color: "#EF4444",
                   }}
                 />
               )}
@@ -235,30 +171,70 @@ const AdminDashboard = () => {
         </Box>
       </Drawer>
 
-      <Box component="main" className="flex-1 overflow-auto bg-gray-50">
-        {isMobile && !drawerOpen && (
-          <IconButton
-            onClick={toggleDrawer}
-            sx={{
-              m: 1,
-              bgcolor: "background.paper",
-              boxShadow: 1,
-              "&:hover": { bgcolor: "background.paper" },
-            }}
+      {/* Main Content Area */}
+      <Box component="main" className=" flex flex-col overflow-hidden">
+        {/* Sticky Top Navigation */}
+        <Box
+          component="nav"
+          className="fixed top-0 z-50 bg-white shadow-sm"
+          sx={{
+            height: "140px",
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            px: { xs: 2, sm: 4 },
+            borderBottom: "1px solid #E5E7EB",
+          }}
+        >
+          {/* Page Title */}
+          <Typography
+            variant="h5"
+            className="font-bold text-gray-800 tracking-tight"
           >
-            <ChevronRight />
-          </IconButton>
-        )}
+            {sidebarItems.find((item) => item.value === activePage)?.name ||
+              "Dashboard"}
+          </Typography>
 
+          {/* Right Side Actions */}
+          <Box className="flex items-center space-x-4">
+            {/* Search */}
+            <IconButton>
+              <Search className="text-gray-600" />
+            </IconButton>
+
+            {/* Notifications */}
+            <IconButton>
+              <Badge badgeContent={4} color="error">
+                <Bell className="text-gray-600" />
+              </Badge>
+            </IconButton>
+
+            {/* User Profile */}
+            <Avatar
+              sx={{
+                width: 40,
+                height: 40,
+                bgcolor: "primary.main",
+              }}
+            >
+              <User size={20} />
+            </Avatar>
+          </Box>
+        </Box>
+
+        {/* Scrollable Content Area */}
         <Box
           sx={{
-            p: { xs: 1, sm: 2 },
-            height: "100%",
+            flexGrow: 1,
+            overflowY: "auto",
+            p: { xs: 2, sm: 4 },
+            backgroundColor: "#F8FAFC",
           }}
         >
           {activePage === "dashboard" && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              dashboard
+              Dashboard Content
             </div>
           )}
           {activePage === "category" && <Categories />}

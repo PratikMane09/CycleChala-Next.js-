@@ -208,7 +208,20 @@ const RegisterForm = () => {
       />
     </svg>
   );
+  const handleGoogleSignIn = async () => {
+    try {
+      // Get Google auth URL from your backend
+      const response = await fetch(`${API_BASE_URL}/api/auth/google`, {
+        method: "GET",
+      });
+      const data = await response.json();
 
+      // Redirect to Google OAuth page
+      window.location.href = data.url;
+    } catch (err) {
+      setError("Failed to initialize Google login");
+    }
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-sky-50 flex items-center justify-center py-6 sm:py-8 px-4 sm:px-6">
       <Paper elevation={3} className="w-full max-w-5xl mx-auto rounded-2xl">
@@ -276,9 +289,7 @@ const RegisterForm = () => {
                       fullWidth
                       variant="outlined"
                       className="py-2 sm:py-2.5 border-gray-300 hover:bg-gray-50 text-gray-700 text-sm sm:text-base font-medium rounded-lg"
-                      onClick={() => {
-                        /* Add Google sign-in handler */
-                      }}
+                      onClick={handleGoogleSignIn} // Add this handler
                     >
                       <GoogleIcon />
                       <span className="ml-2">Continue with Google</span>

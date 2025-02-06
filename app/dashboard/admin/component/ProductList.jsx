@@ -20,7 +20,8 @@ import { getProductImage } from "./productUtils.js";
 const ProductList = ({ products, onEdit, onDelete }) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
-  console.log("selcetd products", selectedProduct);
+  console.log("selcetd products", products);
+
   const handleViewDetails = (product) => {
     setSelectedProduct(product);
     setDetailsOpen(true);

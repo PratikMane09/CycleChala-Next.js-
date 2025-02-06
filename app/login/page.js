@@ -107,8 +107,19 @@ const LoginForm = () => {
       setError(error.message);
     }
   };
-  const handleGoogleSignIn = () => {
-    // Implement Google Sign-in logic here
+  const handleGoogleSignIn = async () => {
+    try {
+      // Get Google auth URL from your backend
+      const response = await fetch(`${API_BASE_URL}/api/auth/google`, {
+        method: "GET",
+      });
+      const data = await response.json();
+
+      // Redirect to Google OAuth page
+      window.location.href = data.url;
+    } catch (err) {
+      setError("Failed to initialize Google login");
+    }
   };
 
   return (

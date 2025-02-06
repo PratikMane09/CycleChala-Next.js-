@@ -38,13 +38,14 @@ const Product = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await apiService.fetchProducts({
+      const response = await apiService.fetchadminProducts({
         page: currentPage,
         search: searchTerm,
         category: filterCategory,
       });
-      setProducts(response.products);
-      setTotalPages(response.pagination.pages);
+      console.log("response", response);
+      setProducts(response.data.products);
+      setTotalPages(response.data.pagination.pages);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -202,9 +203,10 @@ const Product = () => {
           },
         }}
       >
-        <DialogTitle className="border-b border-gray-200 pb-4">
+        <DialogTitle>
           <Typography
             variant="h6"
+            component="div" // Change the component to 'div'
             className="font-sans font-bold text-gray-800"
           >
             {selectedProduct ? "Edit Product" : "Add New Product"}

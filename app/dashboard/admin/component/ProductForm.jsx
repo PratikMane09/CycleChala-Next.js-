@@ -46,8 +46,9 @@ const ProductForm = ({
         size: "",
         weight: 0,
       },
+
       drivetrain: {
-        type: "",
+        type: "", // Explicitly initialize type
         gearSystem: "",
         speeds: 0,
       },
@@ -105,11 +106,22 @@ const ProductForm = ({
       setFormData((prevData) => ({
         ...prevData,
         ...initialData,
+        specifications: {
+          ...prevData.specifications,
+          ...(initialData.specifications || {}),
+          drivetrain: {
+            type: initialData.specifications?.drivetrain?.type || "",
+            gearSystem:
+              initialData.specifications?.drivetrain?.gearSystem || "",
+            speeds: initialData.specifications?.drivetrain?.speeds || 0,
+          },
+          metadata: {
+            ...prevData.metadata,
+            ...(initialData.metadata || {}),
+            searchTags: initialData.metadata?.searchTags || [], // Ensure it's an array
+          },
+        },
       }));
-      // Set existing images if they exist
-      if (initialData.images && initialData.images.length > 0) {
-        setExistingImages(initialData.images);
-      }
     }
   }, [initialData]);
 
@@ -667,7 +679,7 @@ const ProductForm = ({
           </Paper>
         </Grid>
 
-        {/* Images */}
+       
         {/* Images */}
         <Grid item xs={12}>
           <Paper elevation={0} sx={{ p: 2, mb: 2 }}>
@@ -1064,7 +1076,7 @@ const ProductForm = ({
                   </Grid>
                 </Box>
                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                  {formData.metadata.searchTags.map((tag, index) => (
+                  {formData.metadata?.searchTags?.map((tag, index) => (
                     <Chip
                       key={index}
                       label={tag}

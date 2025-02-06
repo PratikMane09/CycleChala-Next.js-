@@ -78,8 +78,79 @@ class ApiService {
     return this.handleResponse(response);
   }
 
-  // New Product Methods
   async fetchProducts(filters = {}) {
+    try {
+      const params = new URLSearchParams();
+
+      // Comprehensive filter mapping
+      const filterMappings = {
+        search: "search",
+        categories: "category",
+        minPrice: "minPrice",
+        maxPrice: "maxPrice",
+        brand: "brand",
+        frameMaterial: "frameMaterial",
+        wheelSize: "wheelSize",
+        suspension: "suspension",
+        categoryType: "categoryType",
+        ageGroup: "ageGroup",
+        gender: "gender",
+        professionalLevel: "professionalLevel",
+        inStock: "inStock",
+        sort: "sort",
+        order: "order",
+        page: "page",
+        limit: "limit",
+      };
+
+      // Dynamic parameter addition
+      Object.entries(filterMappings).forEach(([filterKey, paramKey]) => {
+        const value = filters[filterKey];
+
+        // Handle array values
+        if (Array.isArray(value)) {
+          params.append(paramKey, value.join(","));
+        }
+        // Handle truthy values for specific keys
+        else if (value !== undefined && value !== null) {
+          params.append(paramKey, value);
+        }
+      });
+
+      const url = `${API_BASE_URL}/api/users/products?${params.toString()}`;
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+
+      return {
+        success: data.success,
+        data: {
+          products: data.data?.products || [],
+          pagination: data.data?.pagination || {
+            total: 0,
+            page: 1,
+            pages: 1,
+            hasMore: false,
+          },
+        },
+      };
+    } catch (error) {
+      console.error("Detailed Product Fetch Error:", error);
+      throw error;
+    }
+  }
+
+  async fetchadminProducts(filters = {}) {
     try {
       const params = new URLSearchParams();
 
@@ -112,7 +183,18 @@ class ApiService {
       const response = await fetch(
         `${API_BASE_URL}/api/admin/products?${params.toString()}`
       );
-      return await this.handleResponse(response);
+      const data = await response.json();
+      return {
+        data: {
+          products: data.data.products || [],
+          pagination: data.data.pagination || {
+            total: 0,
+            page: 1,
+            pages: 1,
+            hasMore: false,
+          },
+        },
+      };
     } catch (error) {
       console.error("Error fetching products:", error);
       throw error;
