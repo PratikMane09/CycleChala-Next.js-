@@ -120,7 +120,7 @@ const OrderDashboard = ({ onOrderClick = () => {} }) => {
   }, [currentPage, statusFilter, searchTerm]);
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
+    <div className="bg-white mt-10 rounded-lg shadow-lg p-6">
       <div className="mb-6">
         <Typography variant="h4" className="text-gray-800 font-bold mb-4">
           Order Management

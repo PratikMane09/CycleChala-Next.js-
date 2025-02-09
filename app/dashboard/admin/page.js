@@ -27,12 +27,14 @@ import {
   Search,
   LogOut,
   User,
+  ListOrderedIcon,
 } from "lucide-react";
 
 import { useRouter } from "next/navigation";
 import Categories from "./component/Categories";
 import Product from "./component/Product";
 import AdminOrders from "./component/AdminOrders";
+import UserController from "./component/UserController";
 const AdminDashboard = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -51,11 +53,20 @@ const AdminDashboard = () => {
 
   const sidebarItems = [
     { name: "Dashboard", icon: <LayoutDashboard />, value: "dashboard" },
+    { name: "Users", icon: <User />, value: "User" },
     { name: "Category", icon: <ChartBar />, value: "category" },
     { name: "Product", icon: <BoxIcon />, value: "product" },
-    { name: "Order", icon: <BoxIcon />, value: "order" },
+    { name: "Order", icon: <ListOrderedIcon />, value: "order" },
   ];
+  const handlelogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("email");
 
+    setUserRole(null);
+    setUserEmail(null);
+    router.push("/");
+  };
   return (
     <Box className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -153,6 +164,7 @@ const AdminDashboard = () => {
               borderRadius: "12px",
               "&:hover": { backgroundColor: "#FEE2E2" },
             }}
+            onClick={handlelogout}
           >
             <ListItemButton>
               <ListItemIcon>
@@ -229,6 +241,7 @@ const AdminDashboard = () => {
           sx={{
             flexGrow: 1,
             overflowY: "auto",
+            width: "100%",
             p: { xs: 2, sm: 4 },
             backgroundColor: "#F8FAFC",
           }}
@@ -238,6 +251,7 @@ const AdminDashboard = () => {
               Dashboard Content
             </div>
           )}
+          {activePage === "User" && <UserController />}
           {activePage === "category" && <Categories />}
           {activePage === "product" && <Product />}
           {activePage === "order" && <AdminOrders />}
