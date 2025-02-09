@@ -19,6 +19,7 @@ import {
   Dialog,
   DialogContent,
   Stack,
+  Popover,
 } from "@mui/material";
 import {
   Phone,
@@ -31,10 +32,44 @@ import {
   Globe,
   Clock,
   LogIn,
+  LogOut,
+  Package,
+  Settings,
+  ChevronDown,
 } from "lucide-react";
-import { useWishlist, WishlistProvider } from "../context/WishlistContext";
+import { useWishlist } from "../context/WishlistContext";
 import { useCart } from "../context/CartContext";
 import SerchSection from "./SearchSection";
+
+// Custom hook for authentication
+const useAuth = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userRole, setUserRole] = useState(null);
+  const [userEmail, setUserEmail] = useState(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    const email = localStorage.getItem("email");
+
+    setIsAuthenticated(!!token);
+    setUserRole(role);
+    setUserEmail(email);
+  }, []);
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("email");
+    setIsAuthenticated(false);
+    setUserRole(null);
+    setUserEmail(null);
+    router.push("/");
+  };
+
+  return { isAuthenticated, userRole, userEmail, logout };
+};
 // Custom theme with professional white color scheme and subtle definition
 const theme = createTheme({
   typography: {
@@ -68,26 +103,60 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const { count: wishlistCount, fetchwishlist } = useWishlist();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const { isAuthenticated, userRole, userEmail, logout } = useAuth();
+  const { count: wishlistCount } = useWishlist();
   const { count: cartcount } = useCart();
-
   const router = useRouter();
   const pathname = usePathname();
   const isActive = useActiveLink();
 
-  // Close menus on route change
-  useEffect(() => {
-    setMobileMenu(false);
-    setIsMenuOpen(false);
-  }, [pathname]);
+  const handleProfileClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
 
-  // Handle mobile auth navigation
-  const handleAuthNavigation = (path) => {
-    setMobileMenu(false);
+  const handleProfileClose = () => {
+    setAnchorEl(null);
+  };
+
+  // Protected route handler
+  const handleProtectedNavigation = (path) => {
+    if (!isAuthenticated) {
+      router.push("/login");
+      return;
+    }
     router.push(path);
   };
 
+  // User menu items
+  const menuItems = [
+    {
+      label: "My Profile",
+      icon: <User size={18} />,
+      onClick: () => router.push("/profile"),
+    },
+    {
+      label: "My Orders",
+      icon: <Package size={18} />,
+      onClick: () => router.push("/order"),
+    },
+    ...(userRole === "admin"
+      ? [
+          {
+            label: "Dashboard",
+            icon: <Settings size={18} />,
+            onClick: () => router.push("/dashboard/admin"),
+          },
+        ]
+      : []),
+    {
+      label: "Logout",
+      icon: <LogOut size={18} />,
+      onClick: logout,
+    },
+  ];
+
+  // Update navLinks based on role
   const navLinks = [
     { path: "/", display: "Home" },
     { path: "/shop", display: "Cycles" },
@@ -95,7 +164,11 @@ const Header = () => {
     { path: "/service", display: "Services" },
     { path: "/locate", display: "Locate Store" },
     { path: "/contact", display: "Contact" },
+    ...(userRole === "admin"
+      ? [{ path: "/admin/dashboard", display: "Dashboard" }]
+      : []),
   ];
+
   const handleSearch = (e) => {
     e.preventDefault(); // Prevent default form submission
     if (searchQuery.trim()) {
@@ -187,6 +260,18 @@ const Header = () => {
       </Container>
     </div>
   );
+
+  // Mobile Menu Items
+  const MobileMenuItem = ({ href, children, onClick }) => (
+    <Link
+      href={href}
+      className="flex items-center w-full px-6 py-4 text-gray-700 hover:bg-gray-50 transition-colors no-underline"
+      onClick={onClick}
+    >
+      {children}
+    </Link>
+  );
+
   return (
     <ThemeProvider theme={theme}>
       <div
@@ -257,7 +342,7 @@ const Header = () => {
                 </Box>
               </Box>
 
-              {/* Action Icons with improved spacing */}
+              {/* Action Icons */}
               <Box
                 className="flex items-center"
                 sx={{ gap: "2rem", ml: "auto" }}
@@ -316,7 +401,97 @@ const Header = () => {
                     )}
                   </div>
                 </Box>
-                {/* Auth Buttons with improved spacing */}
+              </Box>
+              {isAuthenticated ? (
+                <div className="relative hidden lg:block">
+                  {" "}
+                  {/* Added relative positioning */}
+                  <Button
+                    onClick={handleProfileClick}
+                    className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                    endIcon={<ChevronDown size={16} />}
+                  >
+                    <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
+                      <span className="text-white text-sm font-medium">
+                        {userEmail?.[0]?.toUpperCase()}
+                      </span>
+                    </div>
+                    <span className="text-sm font-medium max-w-[150px] truncate">
+                      {userEmail}
+                    </span>
+                  </Button>
+                  {/* Profile Menu */}
+                  <Popover
+                    open={Boolean(anchorEl)}
+                    anchorEl={anchorEl}
+                    onClose={handleProfileClose}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "center",
+                    }}
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "center",
+                    }}
+                    PaperProps={{
+                      elevation: 2,
+                      sx: {
+                        mt: 1,
+                        minWidth: "200px",
+                        maxWidth: "250px",
+                        overflow: "visible",
+                        filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.1))",
+                        "&:before": {
+                          content: '""',
+                          display: "block",
+                          position: "absolute",
+                          top: 0,
+                          right: 14,
+                          width: 10,
+                          height: 10,
+                          bgcolor: "background.paper",
+                          transform: "translateY(-50%) rotate(45deg)",
+                          zIndex: 0,
+                        },
+                      },
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        bgcolor: "background.paper",
+                        position: "relative",
+                      }}
+                    >
+                      {/* User Info Section */}
+                      <div className="px-4 py-3 border-b border-gray-100">
+                        <div className="text-sm font-medium text-gray-900">
+                          {userEmail}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1 capitalize">
+                          {userRole}
+                        </div>
+                      </div>
+
+                      {/* Menu Items */}
+                      <div className="py-1">
+                        {menuItems.map((item, index) => (
+                          <button
+                            key={index}
+                            onClick={() => {
+                              item.onClick();
+                              handleProfileClose();
+                            }}
+                            className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          >
+                            {item.icon}
+                            <span>{item.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </Box>
+                  </Popover>
+                </div>
+              ) : (
                 <Box className="hidden lg:flex items-center gap-3">
                   <Link href="/login" className="no-underline">
                     <Button
@@ -366,166 +541,250 @@ const Header = () => {
                     </Button>
                   </Link>
                 </Box>
-                <Box className="flex lg:hidden items-center">
-                  <IconButton
-                    className="relative p-2 rounded-lg hover:bg-gray-50"
-                    onClick={() => setMobileMenu(true)}
-                  >
-                    <User size={22} className="text-gray-700" />
-                  </IconButton>
-                </Box>
-                {/* Mobile Menu */}
-                <Dialog
-                  open={mobileMenu}
-                  onClose={() => setMobileMenu(false)}
-                  className="lg:hidden"
-                  fullWidth
-                  maxWidth="xs"
-                >
-                  <DialogContent className="p-4">
-                    <Stack spacing={2}>
-                      <Button
-                        fullWidth
-                        variant="outlined"
-                        startIcon={<LogIn size={18} />}
-                        onClick={() => handleAuthNavigation("/login")}
-                        sx={{
-                          height: "48px",
-                          color: "#0284c7",
-                          borderColor: "#0284c7",
-                          borderWidth: "1.5px",
-                          borderRadius: "8px",
-                          textTransform: "none",
-                        }}
-                      >
-                        Sign In
-                      </Button>
-                      <Button
-                        fullWidth
-                        variant="contained"
-                        startIcon={<User size={18} />}
-                        onClick={() => handleAuthNavigation("/register")}
-                        sx={{
-                          height: "48px",
-                          backgroundColor: "#0284c7",
-                          borderRadius: "8px",
-                          textTransform: "none",
-                        }}
-                      >
-                        Create Account
-                      </Button>
-                    </Stack>
-                  </DialogContent>
-                </Dialog>
-              </Box>
+              )}
+
+              {/* Mobile User Menu Button */}
+              <IconButton
+                className="lg:hidden"
+                onClick={() => setMobileMenu(true)}
+              >
+                <User size={22} className="text-gray-600" />
+              </IconButton>
             </Toolbar>
           </Container>
         </AppBar>
 
-        {/* Mobile Drawer */}
+        {/* Mobile Navigation Drawer */}
         <Drawer
           anchor="left"
           open={isMenuOpen}
           onClose={() => setIsMenuOpen(false)}
-          className="lg:hidden"
-          PaperProps={{
-            sx: {
-              backgroundColor: "#FFFFFF",
-              width: 320,
-              boxShadow: "0 8px 16px rgba(0,0,0,0.08)",
-              borderRight: "1px solid rgba(0,0,0,0.08)",
-              zIndex: 45,
-            },
-          }}
-          ModalProps={{
-            sx: {
-              zIndex: 45,
+          sx={{
+            display: { xs: "block", lg: "none" },
+            "& .MuiDrawer-paper": {
+              width: 280,
+              bgcolor: "background.paper",
             },
           }}
         >
-          <Box className="h-full bg-white">
-            {/* Header with Logo */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-100">
-              <div className="flex items-center space-x-2">
-                <img
-                  src="/api/placeholder/32/32"
-                  alt="Logo"
-                  className="h-8 w-8"
-                />
-                <span className="text-xl font-semibold text-gray-900">
-                  CycleChala
-                </span>
-              </div>
-              <IconButton
-                onClick={() => setIsMenuOpen(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
+          <Box className="h-full flex flex-col">
+            <div className="p-4 flex items-center justify-between border-b">
+              <span className="text-xl font-semibold">CycleChala</span>
+              <IconButton onClick={() => setIsMenuOpen(false)}>
                 <X size={24} />
               </IconButton>
             </div>
 
-            {/* Navigation Links */}
-            <List className="py-4">
-              {navLinks.map((link) => (
-                <ListItem
-                  key={link.path}
-                  disablePadding
-                  className={isActive(link.path) ? "bg-blue-50" : ""}
-                >
-                  <Link
-                    href={link.path}
-                    className={`flex items-center w-full px-6 py-4
-                  transition-all duration-200 no-underline
-                  ${
-                    isActive(link.path)
-                      ? "text-blue-600 bg-blue-50 font-medium"
-                      : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"
-                  }`}
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <ListItemText
-                      primary={link.display}
-                      primaryTypographyProps={{
-                        sx: {
-                          fontSize: "1rem",
-                          letterSpacing: "-0.01em",
-                          fontWeight: isActive(link.path) ? 500 : 400,
-                          lineHeight: 1.5,
-                        },
-                      }}
-                    />
-                  </Link>
-                </ListItem>
-              ))}
-
-              {/* Auth Section */}
-              <Divider className="my-4" />
-              <div className="px-6 py-4 space-y-3">
-                <Link
-                  href="/login"
-                  className="flex w-full py-3 px-6 text-white bg-blue-600 rounded-lg
-                font-medium text-center justify-center hover:bg-blue-700
-                transition-colors duration-200 no-underline"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Login
-                </Link>
-                <Link
-                  href="/register"
-                  className="flex w-full py-3 px-6 text-blue-600 bg-blue-50 rounded-lg
-                font-medium text-center justify-center hover:bg-blue-100
-                transition-colors duration-200 no-underline"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Register
-                </Link>
+            {isAuthenticated && (
+              <div className="p-4 bg-gray-50 border-b">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
+                    <span className="text-white font-medium">
+                      {userEmail?.[0]?.toUpperCase()}
+                    </span>
+                  </div>
+                  <div>
+                    <div className="font-medium text-sm">{userEmail}</div>
+                    <div className="text-sm text-gray-500 capitalize">
+                      {userRole}
+                    </div>
+                  </div>
+                </div>
               </div>
-            </List>
+            )}
+
+            <div className="flex-1 overflow-y-auto">
+              {navLinks.map((link) => (
+                <MobileMenuItem
+                  key={link.path}
+                  href={link.path}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <span className={isActive(link.path) ? "text-blue-600" : ""}>
+                    {link.display}
+                  </span>
+                </MobileMenuItem>
+              ))}
+            </div>
+
+            {!isAuthenticated && (
+              <div className="p-4 border-t">
+                <Stack spacing={2}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    startIcon={<LogIn size={18} />}
+                    onClick={() => {
+                      router.push("/login");
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    Sign In
+                  </Button>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    startIcon={<User size={18} />}
+                    onClick={() => {
+                      router.push("/register");
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    Create Account
+                  </Button>
+                </Stack>
+              </div>
+            )}
           </Box>
         </Drawer>
+
+        {/* Mobile Auth Dialog */}
+        <Dialog
+          open={mobileMenu}
+          onClose={() => setMobileMenu(false)}
+          fullWidth
+          maxWidth="xs"
+          sx={{
+            display: { lg: "none" },
+            "& .MuiDialog-paper": {
+              borderRadius: "16px",
+              margin: "16px",
+            },
+          }}
+        >
+          <DialogContent sx={{ padding: "24px" }}>
+            {isAuthenticated ? (
+              <div>
+                {/* User Profile Header */}
+                <div className="flex items-center gap-3 mb-6 p-3 bg-gray-50 rounded-lg">
+                  <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center">
+                    <span className="text-white text-lg font-semibold">
+                      {userEmail?.[0]?.toUpperCase()}
+                    </span>
+                  </div>
+                  <div>
+                    <div className="text-gray-900 font-medium">{userEmail}</div>
+                    <div className="text-gray-500 text-sm capitalize">
+                      {userRole} Account
+                    </div>
+                  </div>
+                </div>
+
+                <Stack spacing={2}>
+                  {menuItems.map((item, index) => (
+                    <Button
+                      key={index}
+                      fullWidth
+                      variant="outlined"
+                      startIcon={item.icon}
+                      onClick={() => {
+                        item.onClick();
+                        setMobileMenu(false);
+                      }}
+                      sx={{
+                        py: 1.5,
+                        px: 3,
+                        justifyContent: "flex-start",
+                        color:
+                          item.label === "Logout"
+                            ? "error.main"
+                            : "text.primary",
+                        borderColor:
+                          item.label === "Logout" ? "error.main" : "divider",
+                        textTransform: "none",
+                        fontWeight: 500,
+                        fontSize: "0.9375rem",
+                        borderRadius: "10px",
+                        "&:hover": {
+                          backgroundColor:
+                            item.label === "Logout"
+                              ? "error.lighter"
+                              : "action.hover",
+                          borderColor:
+                            item.label === "Logout"
+                              ? "error.main"
+                              : "primary.main",
+                        },
+                      }}
+                    >
+                      {item.label}
+                    </Button>
+                  ))}
+                </Stack>
+              </div>
+            ) : (
+              <div>
+                <div className="text-center mb-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                    Welcome to CycleChala
+                  </h2>
+                  <p className="text-gray-600 text-sm">
+                    Sign in to access your account and preferences
+                  </p>
+                </div>
+
+                <Stack spacing={2.5}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    startIcon={<LogIn size={20} />}
+                    onClick={() => {
+                      router.push("/login");
+                      setMobileMenu(false);
+                    }}
+                    sx={{
+                      py: 1.5,
+                      textTransform: "none",
+                      fontSize: "0.9375rem",
+                      fontWeight: 500,
+                      borderRadius: "10px",
+                      borderWidth: "1.5px",
+                      color: "primary.main",
+                      borderColor: "primary.main",
+                      "&:hover": {
+                        borderWidth: "1.5px",
+                        backgroundColor: "primary.lighter",
+                      },
+                    }}
+                  >
+                    Sign In
+                  </Button>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    startIcon={<User size={20} />}
+                    onClick={() => {
+                      router.push("/register");
+                      setMobileMenu(false);
+                    }}
+                    sx={{
+                      py: 1.5,
+                      textTransform: "none",
+                      fontSize: "0.9375rem",
+                      fontWeight: 500,
+                      borderRadius: "10px",
+                      boxShadow: "none",
+                      backgroundColor: "primary.main",
+                      "&:hover": {
+                        backgroundColor: "primary.dark",
+                        boxShadow: "none",
+                      },
+                    }}
+                  >
+                    Create Account
+                  </Button>
+                </Stack>
+
+                <div className="mt-6 text-center text-sm text-gray-500">
+                  By continuing, you agree to our Terms of Service and Privacy
+                  Policy
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
-      <div className="h-[70px]" />{" "}
-      {/* Adjust this value based on your header height */}
+      <div className="h-[70px]" />
     </ThemeProvider>
   );
 };

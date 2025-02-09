@@ -32,7 +32,7 @@ import {
 import { useRouter } from "next/navigation";
 import Categories from "./component/Categories";
 import Product from "./component/Product";
-
+import AdminOrders from "./component/AdminOrders";
 const AdminDashboard = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -53,6 +53,7 @@ const AdminDashboard = () => {
     { name: "Dashboard", icon: <LayoutDashboard />, value: "dashboard" },
     { name: "Category", icon: <ChartBar />, value: "category" },
     { name: "Product", icon: <BoxIcon />, value: "product" },
+    { name: "Order", icon: <BoxIcon />, value: "order" },
   ];
 
   return (
@@ -239,6 +240,7 @@ const AdminDashboard = () => {
           )}
           {activePage === "category" && <Categories />}
           {activePage === "product" && <Product />}
+          {activePage === "order" && <AdminOrders />}
         </Box>
       </Box>
     </Box>

@@ -1,15 +1,19 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+
+import React, { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCart } from "../context/CartContext";
 import { toast } from "react-hot-toast";
 import { ArrowLeft, Truck, MapPin, Phone } from "lucide-react";
 import { API_BASE_URL } from "../../config/api";
 
-const CheckoutPage = () => {
+const CheckoutContent = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { items, metadata, clearCart } = useCart();
   const [loading, setLoading] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [originalOrder, setOriginalOrder] = useState(null);
 
   const [formData, setFormData] = useState({
     billingAddress: {
@@ -19,6 +23,7 @@ const CheckoutPage = () => {
       state: "",
       zipCode: "",
       phone: "",
+      country: "",
     },
     shippingAddress: {
       name: "",
@@ -27,16 +32,71 @@ const CheckoutPage = () => {
       state: "",
       zipCode: "",
       phone: "",
+      country: "",
     },
     sameAsBilling: true,
   });
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
       toast.error("Please login to continue");
       router.push("/login");
+      return;
+    }
+
+    const orderId = searchParams.get("orderId");
+    if (orderId) {
+      fetchOrderDetails(orderId, token);
     }
   }, []);
+
+  const fetchOrderDetails = async (orderId, token) => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/users/orders/${orderId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+
+      if (data.success) {
+        setIsUpdating(true);
+        setOriginalOrder(data.data);
+
+        // Populate form with existing order data
+        setFormData({
+          billingAddress: {
+            name: data.data.billing.name || "",
+            street: data.data.billing.address.street || "",
+            city: data.data.billing.address.city || "",
+            state: data.data.billing.address.state || "",
+            zipCode: data.data.billing.address.zipCode || "",
+            country: data.data.billing.address.country || "",
+            phone: data.data.billing.phone || "",
+          },
+          shippingAddress: {
+            name: data.data.shipping.name || "",
+            street: data.data.shipping.address.street || "",
+            city: data.data.shipping.address.city || "",
+            state: data.data.shipping.address.state || "",
+            zipCode: data.data.shipping.address.zipCode || "",
+            country: data.data.shipping.address.country || "",
+            phone: data.data.shipping.phone || "",
+          },
+          sameAsBilling: false,
+        });
+      } else {
+        toast.error("Error fetching order details");
+      }
+    } catch (error) {
+      toast.error("Error fetching order details");
+    }
+  };
+
   const handleInputChange = (section, field, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -68,9 +128,16 @@ const CheckoutPage = () => {
     e.preventDefault();
     setLoading(true);
     const token = localStorage.getItem("token");
+
     try {
-      const response = await fetch(`${API_BASE_URL}/api/users/orders`, {
-        method: "POST",
+      const url = isUpdating
+        ? `${API_BASE_URL}/api/users/orders`
+        : `${API_BASE_URL}/api/users/orders`;
+
+      const method = isUpdating ? "POST" : "POST";
+
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -80,28 +147,37 @@ const CheckoutPage = () => {
           shippingAddress: formData.sameAsBilling
             ? formData.billingAddress
             : formData.shippingAddress,
+          orderId: isUpdating ? originalOrder._id : undefined,
         }),
       });
 
       const data = await response.json();
 
       if (data.success) {
-        toast.success("Order placed successfully!");
-        clearCart();
-        router.push(`${API_BASE_URL}/api/users/orders/${data.data._id}`);
+        toast.success(
+          isUpdating
+            ? "Order updated successfully!"
+            : "Order placed successfully!"
+        );
+        if (!isUpdating) {
+          clearCart();
+        }
+        router.push("/order");
       } else {
-        toast.error(data.message || "Error placing order");
+        toast.error(
+          data.message || `Error ${isUpdating ? "updating" : "placing"} order`
+        );
       }
     } catch (error) {
-      toast.error("Error placing order");
+      toast.error(`Error ${isUpdating ? "updating" : "placing"} order`);
     } finally {
       setLoading(false);
     }
   };
 
-  if (items.length === 0) {
+  if (!isUpdating && items.length === 0) {
     return (
-      <div className="min-h-screen  bg-gray-50 py-12 px-4">
+      <div className="min-h-screen bg-gray-50 py-12 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-2xl font-semibold text-gray-900">
             Your cart is empty
@@ -127,7 +203,9 @@ const CheckoutPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Form Section */}
           <div className="space-y-6">
-            <h1 className="text-2xl font-bold text-gray-900">Checkout</h1>
+            <h1 className="text-2xl font-bold text-gray-900">
+              {isUpdating ? "Update Order" : "Checkout"}
+            </h1>
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Billing Address */}
               <div className="bg-white p-6 rounded-lg shadow-sm">
@@ -221,6 +299,24 @@ const CheckoutPage = () => {
                         handleInputChange(
                           "billingAddress",
                           "state",
+                          e.target.value
+                        )
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Country
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
+                      value={formData.billingAddress.country}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "billingAddress",
+                          "country",
                           e.target.value
                         )
                       }
@@ -388,62 +484,78 @@ const CheckoutPage = () => {
                 className="w-full bg-sky-600 text-white py-3 rounded-lg font-semibold hover:bg-sky-700 disabled:opacity-50"
               >
                 {loading
-                  ? "Placing Order..."
+                  ? isUpdating
+                    ? "Updating Order..."
+                    : "Placing Order..."
+                  : isUpdating
+                  ? "Update Order"
                   : "Place Order (Cash on Delivery)"}
               </button>
             </form>
           </div>
 
-          {/* Order Summary */}
-          <div className="lg:sticky mt-10 lg:top-4 h-fit">
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                Order Summary
-              </h2>
-              <div className="space-y-4">
-                {items.map((item) => (
-                  <div key={item.product._id} className="flex justify-between">
-                    <div>
-                      <p className="font-medium">{item.product.name}</p>
-                      <p className="text-sm text-gray-600">
-                        Qty: {item.quantity}
+          {!isUpdating && (
+            <div className="lg:sticky mt-10 lg:top-4 h-fit">
+              <div className="bg-white p-6 rounded-lg shadow-sm">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                  Order Summary
+                </h2>
+                <div className="space-y-4">
+                  {items.map((item) => (
+                    <div
+                      key={item.product._id}
+                      className="flex justify-between"
+                    >
+                      <div>
+                        <p className="font-medium">{item.product.name}</p>
+                        <p className="text-sm text-gray-600">
+                          Qty: {item.quantity}
+                        </p>
+                      </div>
+                      <p className="font-medium">
+                        ₹{item.price.finalPrice.toFixed(2)}
                       </p>
                     </div>
-                    <p className="font-medium">
-                      ₹{item.price.finalPrice.toFixed(2)}
-                    </p>
-                  </div>
-                ))}
-                <div className="border-t pt-4 space-y-2">
-                  <div className="flex justify-between text-gray-600">
-                    <span>Subtotal</span>
-                    <span>₹{metadata.subtotal?.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-gray-600">
-                    <span>Shipping</span>
-                    <span>₹{metadata.shipping?.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-gray-600">
-                    <span>Tax</span>
-                    <span>₹{metadata.tax?.toFixed(2)}</span>
-                  </div>
-                  {metadata.discount > 0 && (
-                    <div className="flex justify-between text-green-600">
-                      <span>Discount</span>
-                      <span>-₹{metadata.discount?.toFixed(2)}</span>
+                  ))}
+                  <div className="border-t pt-4 space-y-2">
+                    <div className="flex justify-between text-gray-600">
+                      <span>Subtotal</span>
+                      <span>₹{metadata.subtotal?.toFixed(2)}</span>
                     </div>
-                  )}
-                  <div className="flex justify-between font-semibold text-lg pt-2 border-t">
-                    <span>Total</span>
-                    <span>₹{metadata.total?.toFixed(2)}</span>
+                    <div className="flex justify-between text-gray-600">
+                      <span>Shipping</span>
+                      <span>₹{metadata.shipping?.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-gray-600">
+                      <span>Tax</span>
+                      <span>₹{metadata.tax?.toFixed(2)}</span>
+                    </div>
+                    {metadata.discount > 0 && (
+                      <div className="flex justify-between text-green-600">
+                        <span>Discount</span>
+                        <span>-₹{metadata.discount?.toFixed(2)}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between font-semibold text-lg pt-2 border-t">
+                      <span>Total</span>
+                      <span>₹{metadata.total?.toFixed(2)}</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
+  );
+};
+
+const CheckoutPage = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CheckoutContent />
+    </Suspense>
   );
 };
 
