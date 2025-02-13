@@ -13,8 +13,10 @@ import {
   Gauge,
   Users,
   Ruler,
+  SlidersHorizontal,
 } from "lucide-react";
 import debounce from "lodash/debounce";
+import { Tune } from "@mui/icons-material";
 
 const FilterSidebar = ({
   categories,
@@ -183,8 +185,15 @@ const FilterSidebar = ({
     setHasChanges(false);
     setShowMobileFilters(false);
   };
-
-  // Component for filter sections
+  const MobileFilterButton = () => (
+    <button
+      onClick={() => setShowMobileFilters(true)}
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 bg-gradient-to-r from-sky-600 to-sky-700 text-white px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group"
+    >
+      <SlidersHorizontal className="w-5 h-5 group-hover:rotate-180 transition-transform duration-300" />
+      <span className="font-medium">Advanced Filters</span>
+    </button>
+  );
   const FilterSection = ({
     title,
     isExpanded,
@@ -195,25 +204,82 @@ const FilterSidebar = ({
     <div className="border-b border-gray-100 pb-4">
       <button
         onClick={onToggle}
-        className="flex items-center justify-between w-full py-3 px-2 hover:bg-gray-50 rounded-lg transition-colors duration-200 group"
+        className="flex items-center justify-between w-full py-3.5 px-3 hover:bg-sky-50/60 rounded-xl transition-all duration-300 group"
       >
         <div className="flex items-center gap-3">
-          <Icon className="w-5 h-5 text-sky-600" />
-          <span className="font-medium text-gray-700 group-hover:text-gray-900">
+          <div className="p-2 bg-sky-100 rounded-lg group-hover:bg-sky-200 transition-colors duration-300">
+            <Icon className="w-5 h-5 text-sky-700" />
+          </div>
+          <span className="font-semibold text-gray-800 group-hover:text-sky-800">
             {title}
           </span>
         </div>
-        {isExpanded ? (
-          <ChevronUp className="w-4 h-4 text-gray-400" />
-        ) : (
-          <ChevronDown className="w-4 h-4 text-gray-400" />
-        )}
+        <div className="p-1.5 bg-gray-100/80 rounded-md group-hover:bg-sky-100 transition-colors duration-300">
+          {isExpanded ? (
+            <ChevronUp className="w-4 h-4 text-gray-600" />
+          ) : (
+            <ChevronDown className="w-4 h-4 text-gray-600" />
+          )}
+        </div>
       </button>
       {isExpanded && (
-        <div className="mt-3 px-2 space-y-2 animate-fade-in">{children}</div>
+        <div className="mt-4 px-3 space-y-2.5 animate-fade-in">{children}</div>
       )}
     </div>
   );
+
+  // Enhanced search input styling
+  const SearchInput = () => (
+    <div className="relative group">
+      <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-sky-600 transition-colors duration-300" />
+      <input
+        ref={searchInputRef}
+        type="text"
+        placeholder="Search filters..."
+        value={searchInputValue}
+        onChange={handleSearchChange}
+        className="w-full pl-11 pr-10 py-3 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all duration-300 placeholder:text-gray-400"
+        autoComplete="off"
+      />
+      {searchInputValue && (
+        <button
+          onClick={handleClearSearch}
+          className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 bg-gray-100 rounded-md hover:bg-sky-100 transition-colors duration-300"
+        >
+          <X className="w-4 h-4 text-gray-500 hover:text-sky-600" />
+        </button>
+      )}
+    </div>
+  );
+
+  // Enhanced mobile view styling
+  const MobileView = () =>
+    showMobileFilters && (
+      <div className="lg:hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-50 transition-all duration-300">
+        <div
+          className="fixed inset-y-0 left-0 w-[340px] bg-white shadow-2xl overflow-hidden flex flex-col animate-slide-in"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex items-center justify-between px-4 py-4 border-b border-gray-100">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-sky-100 rounded-lg">
+                <Tune className="w-5 h-5 text-sky-700" />
+              </div>
+              <h2 className="text-lg font-semibold text-gray-800">Filters</h2>
+            </div>
+            <button
+              onClick={() => setShowMobileFilters(false)}
+              className="p-2 hover:bg-gray-100 rounded-xl transition-all duration-300"
+            >
+              <X className="w-6 h-6 text-gray-500" />
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto px-4 py-4">
+            <FilterContent />
+          </div>
+        </div>
+      </div>
+    );
 
   // Main filter content component
   const FilterContent = () => (
@@ -503,17 +569,18 @@ const FilterSidebar = ({
   return (
     <>
       {/* Desktop View */}
-      <div className="hidden lg:block bg-white rounded-lg shadow-lg">
-        <div className="w-full p-4">
+      <div className="hidden lg:block bg-white rounded-xl shadow-lg border border-gray-100">
+        <div className="w-full p-5">
           <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-2">
-              <Filter className="w-5 h-5 text-sky-600" />
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-sky-100 rounded-lg">
+                <Tune className="w-5 h-5 text-sky-700" />
+              </div>
               <h2 className="text-lg font-semibold text-gray-800">Filters</h2>
             </div>
-
             <button
               onClick={clearAllFilters}
-              className="text-sm text-gray-500 hover:text-sky-600 transition-colors duration-200"
+              className="px-3 py-1.5 text-sm text-gray-500 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-all duration-300"
             >
               Clear all
             </button>
@@ -523,30 +590,12 @@ const FilterSidebar = ({
       </div>
 
       {/* Mobile View */}
-      {showMobileFilters && (
-        <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-50">
-          <div
-            className="fixed inset-y-0 left-0 w-[320px] bg-white shadow-xl overflow-hidden flex flex-col animate-slide-in"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-              <div className="flex items-center gap-2">
-                <Filter className="w-5 h-5 text-sky-600" />
-                <h2 className="text-lg font-semibold text-gray-800">Filters</h2>
-              </div>
-              <button
-                onClick={() => setShowMobileFilters(false)}
-                className="p-1 hover:bg-gray-100 rounded-full transition-colors duration-200"
-              >
-                <X className="w-6 h-6 text-gray-500" />
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto px-4 py-2">
-              <FilterContent />
-            </div>
-          </div>
-        </div>
-      )}
+      <MobileView />
+
+      {/* Mobile Filter Button */}
+      <div className="lg:hidden">
+        <MobileFilterButton />
+      </div>
     </>
   );
 };

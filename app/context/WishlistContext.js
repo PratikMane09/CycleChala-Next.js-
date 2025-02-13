@@ -20,6 +20,12 @@ export const WishlistProvider = ({ children }) => {
     isInitialized: false,
   });
 
+  const isAuthorizedStudent = () => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    return token && role === "student";
+  };
+
   const handleApiResponse = async (response) => {
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);
@@ -34,15 +40,15 @@ export const WishlistProvider = ({ children }) => {
   };
 
   const fetchWishlist = useCallback(async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      toast.error("Please login to view wishlist");
+    if (!isAuthorizedStudent()) {
+      toast.error("Only students can access the wishlist");
       setWishlist((prev) => ({ ...prev, isInitialized: true }));
       return;
     }
 
     try {
       setWishlist((prev) => ({ ...prev, loading: true }));
+      const token = localStorage.getItem("token");
 
       const data = await handleApiResponse(
         await fetch(`${API_BASE_URL}/api/users/wishlist`, {
@@ -53,17 +59,17 @@ export const WishlistProvider = ({ children }) => {
         })
       );
 
-      console.log("Wishlist Data:", data); // Debug log
+      console.log("Wishlist Data:", data);
 
       setWishlist({
-        items: data.products || [], // Ensure fallback to empty array
+        items: data.products || [],
         count: (data.products || []).length,
         loading: false,
         metadata: data.metadata,
         isInitialized: true,
       });
     } catch (error) {
-      console.error("Wishlist Fetch Error:", error); // Debug log
+      console.error("Wishlist Fetch Error:", error);
       toast.error(error.message);
       setWishlist((prev) => ({
         ...prev,
@@ -74,18 +80,18 @@ export const WishlistProvider = ({ children }) => {
   }, []);
 
   const modifyWishlist = useCallback(async (productId, method) => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    if (!isAuthorizedStudent()) {
       toast.error(
-        `Please login to ${
+        `Only students can ${
           method === "POST" ? "add to" : "remove from"
-        } wishlist`
+        } the wishlist`
       );
       return;
     }
 
     try {
       setWishlist((prev) => ({ ...prev, loading: true }));
+      const token = localStorage.getItem("token");
 
       const data = await handleApiResponse(
         await fetch(`${API_BASE_URL}/api/users/products/${productId}`, {
@@ -98,7 +104,7 @@ export const WishlistProvider = ({ children }) => {
       );
 
       setWishlist({
-        items: data.products || [], // Ensure fallback to empty array
+        items: data.products || [],
         count: (data.products || []).length,
         loading: false,
         metadata: data.metadata,
@@ -122,10 +128,8 @@ export const WishlistProvider = ({ children }) => {
     return wishlist.items.some((item) => item.product._id === productId);
   };
 
-  // Automatically fetch wishlist when a token is present on mount
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token && !wishlist.isInitialized) {
+    if (isAuthorizedStudent() && !wishlist.isInitialized) {
       fetchWishlist();
     }
   }, [fetchWishlist, wishlist.isInitialized]);
@@ -136,6 +140,7 @@ export const WishlistProvider = ({ children }) => {
     addToWishlist: (productId) => modifyWishlist(productId, "POST"),
     removeFromWishlist: (productId) => modifyWishlist(productId, "DELETE"),
     isInWishlist,
+    isAuthorizedStudent,
   };
 
   return (

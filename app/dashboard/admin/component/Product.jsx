@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import imageCompression from "browser-image-compression";
 import { Plus, Upload } from "lucide-react";
 import {
   Alert,
@@ -70,32 +71,57 @@ const Product = () => {
       reader.readAsDataURL(file);
     });
   };
-
   const handleSubmit = async (formData) => {
     try {
       setLoading(true);
+      const dataObj = JSON.parse(formData.get("data"));
 
-      // Handle image conversion to base64
-      const images = formData.get("images");
-      if (images) {
-        const imageFiles = Array.from(images);
-        const convertedImages = await Promise.all(
-          imageFiles.map(async (file) => ({
-            data: await handleImageConversion(file),
-            contentType: file.type,
-            filename: file.name,
-          }))
-        );
+      // Create new FormData object
+      const updatedFormData = new FormData();
+      updatedFormData.append("data", JSON.stringify(dataObj));
 
-        const dataObj = JSON.parse(formData.get("data"));
-        dataObj.images = convertedImages;
-        formData.set("data", JSON.stringify(dataObj));
-      }
+      // Get all images
+      const images = formData.getAll("images");
+
+      // Get and parse image metadata array
+      const imageMetadataStr = formData.get("imageMetadata");
+      const imageMetadata = imageMetadataStr
+        ? JSON.parse(imageMetadataStr)
+        : [];
+
+      // Append images
+      images.forEach((image, index) => {
+        updatedFormData.append("images", image);
+      });
+
+      // Create a single array of metadata for all images
+      const completeMetadataArray = images.map((image, index) => {
+        const metadata = imageMetadata[index] || {};
+        return {
+          isPrimary: index === 0 && !dataObj.keepExistingImages,
+          filename: image.name,
+          alt: `${dataObj.name} - ${metadata.color?.name || "Image"} ${
+            index + 1
+          }`,
+          color: metadata.color
+            ? {
+                name: metadata.color.name,
+                hexCode: metadata.color.hexCode,
+              }
+            : null,
+        };
+      });
+
+      // Append the complete metadata array as a single JSON string
+      updatedFormData.append(
+        "imageMetadata",
+        JSON.stringify(completeMetadataArray)
+      );
 
       if (selectedProduct) {
-        await apiService.updateProduct(selectedProduct._id, formData);
+        await apiService.updateProduct(selectedProduct._id, updatedFormData);
       } else {
-        await apiService.createProduct(formData);
+        await apiService.createProduct(updatedFormData);
       }
 
       setShowForm(false);

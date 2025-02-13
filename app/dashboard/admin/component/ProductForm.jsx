@@ -29,6 +29,7 @@ const ProductForm = ({
 }) => {
   const [existingImages, setExistingImages] = useState([]);
   const [newImages, setNewImages] = useState([]);
+  const [newColor, setNewColor] = useState({ name: "", hexCode: "" });
 
   const [formData, setFormData] = useState({
     name: "",
@@ -41,6 +42,13 @@ const ProductForm = ({
       currency: "INR",
     },
     specifications: {
+      colors: {
+        available: [],
+        primary: {
+          name: "",
+          hexCode: "",
+        },
+      },
       frame: {
         material: "",
         size: "",
@@ -100,7 +108,21 @@ const ProductForm = ({
   const [newTag, setNewTag] = useState("");
   const [newMaintenance, setNewMaintenance] = useState("");
   const [newAccessory, setNewAccessory] = useState("");
-
+  const handleColorAdd = () => {
+    if (newColor.name && newColor.hexCode) {
+      setFormData((prev) => ({
+        ...prev,
+        specifications: {
+          ...prev.specifications,
+          colors: {
+            ...prev.specifications.colors,
+            available: [...prev.specifications.colors.available, newColor],
+          },
+        },
+      }));
+      setNewColor({ name: "", hexCode: "" });
+    }
+  };
   useEffect(() => {
     if (initialData) {
       setFormData((prevData) => ({
@@ -179,9 +201,42 @@ const ProductForm = ({
   };
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    setNewImages((prev) => [...prev, ...files]);
+    // Initialize new images with null color - will be set via dropdown
+    const newImagesWithColor = files.map((file) => ({
+      file,
+      color: null, // Initialize with null
+      isPrimary: false, // Will be set based on logic
+    }));
+
+    // Set first image as primary if no existing images
+    if (existingImages.length === 0 && newImages.length === 0) {
+      newImagesWithColor[0].isPrimary = true;
+    }
+
+    setNewImages((prev) => [...prev, ...newImagesWithColor]);
   };
 
+  const handleImageColorChange = (imageIndex, colorHexCode) => {
+    const selectedColor = formData.specifications.colors.available.find(
+      (c) => c.hexCode === colorHexCode
+    );
+
+    setNewImages((prev) =>
+      prev.map((img, i) =>
+        i === imageIndex
+          ? {
+              ...img,
+              color: selectedColor
+                ? {
+                    name: selectedColor.name,
+                    hexCode: selectedColor.hexCode,
+                  }
+                : null,
+            }
+          : img
+      )
+    );
+  };
   // Add function to remove existing image
   const handleRemoveExistingImage = (index) => {
     setExistingImages(existingImages.filter((_, i) => i !== index));
@@ -246,36 +301,41 @@ const ProductForm = ({
     return Object.keys(newErrors).length === 0;
   };
 
+  // In ProductForm.jsx, modify the handleSubmit function:
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     const formDataObj = new FormData();
 
-    // Add keepExistingImages flag and existing image IDs if updating
+    // Prepare the submit data
     const submitData = {
       ...formData,
       keepExistingImages: existingImages.length > 0,
-      existingImageIds: existingImages.map((img) => img._id), // If you have image IDs
+      existingImageIds: existingImages.map((img) => img._id),
     };
 
     formDataObj.append("data", JSON.stringify(submitData));
 
-    // Append new images
+    // Append all images
     newImages.forEach((image, index) => {
-      formDataObj.append("images", image);
-      formDataObj.append(
-        `imageMetadata[${index}]`,
-        JSON.stringify({
-          isPrimary: existingImages.length === 0 && index === 0, // Only primary if no existing images
-          filename: image.name,
-          alt: `${formData.name} - Image ${index + 1}`,
-        })
-      );
+      formDataObj.append("images", image.file);
     });
+
+    // Make sure color data is properly structured
+    const imageMetadata = newImages.map((image, index) => ({
+      isPrimary: existingImages.length === 0 && index === 0,
+      filename: image.file.name,
+      alt: `${formData.name} - ${image.color?.name || "Image"} ${index + 1}`,
+      color: image.color
+        ? {
+            name: image.color.name,
+            hexCode: image.color.hexCode,
+          }
+        : null,
+    }));
+
+    formDataObj.append("imageMetadata", JSON.stringify(imageMetadata));
 
     onSubmit(formDataObj);
   };
@@ -404,7 +464,72 @@ const ProductForm = ({
             <Typography variant="h6" gutterBottom>
               Specifications
             </Typography>
-
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="subtitle1" gutterBottom>
+                Colors
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={5}>
+                  <TextField
+                    fullWidth
+                    label="Color Name"
+                    value={newColor.name}
+                    onChange={(e) =>
+                      setNewColor((prev) => ({ ...prev, name: e.target.value }))
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} md={5}>
+                  <TextField
+                    fullWidth
+                    label="Hex Code"
+                    value={newColor.hexCode}
+                    onChange={(e) =>
+                      setNewColor((prev) => ({
+                        ...prev,
+                        hexCode: e.target.value,
+                      }))
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} md={2}>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    onClick={handleColorAdd}
+                    sx={{ height: "56px" }}
+                  >
+                    Add Color
+                  </Button>
+                </Grid>
+              </Grid>
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 2 }}>
+                {formData.specifications.colors.available.map(
+                  (color, index) => (
+                    <Chip
+                      key={index}
+                      label={`${color.name} (${color.hexCode})`}
+                      style={{ backgroundColor: color.hexCode }}
+                      onDelete={() => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          specifications: {
+                            ...prev.specifications,
+                            colors: {
+                              ...prev.specifications.colors,
+                              available:
+                                prev.specifications.colors.available.filter(
+                                  (_, i) => i !== index
+                                ),
+                            },
+                          },
+                        }));
+                      }}
+                    />
+                  )
+                )}
+              </Box>
+            </Box>
             {/* Frame */}
             <Box sx={{ mb: 3 }}>
               <Typography variant="subtitle1" gutterBottom>
@@ -679,7 +804,6 @@ const ProductForm = ({
           </Paper>
         </Grid>
 
-       
         {/* Images */}
         <Grid item xs={12}>
           <Paper elevation={0} sx={{ p: 2, mb: 2 }}>
@@ -757,38 +881,103 @@ const ProductForm = ({
               ))}
 
               {/* New Images */}
-              {newImages.map((image, index) => (
+              {newImages.map((imageObj, index) => (
                 <Box
                   key={`new-${index}`}
                   sx={{
                     position: "relative",
                     width: 100,
                     height: 100,
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
+                    overflow: "hidden",
                   }}
                 >
                   <img
-                    src={URL.createObjectURL(image)}
+                    src={URL.createObjectURL(imageObj.file)}
                     alt={`New Image ${index + 1}`}
                     style={{
                       width: "100%",
                       height: "100%",
                       objectFit: "cover",
-                      borderRadius: "4px",
                     }}
                   />
-                  <IconButton
-                    size="small"
+                  <Box
                     sx={{
                       position: "absolute",
-                      top: -10,
-                      right: -10,
-                      backgroundColor: "white",
-                      "&:hover": { backgroundColor: "#f5f5f5" },
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      bgcolor: "rgba(255,255,255,0.9)",
                     }}
-                    onClick={() => handleRemoveNewImage(index)}
                   >
-                    <Delete />
+                    <FormControl fullWidth size="small">
+                      <Select
+                        value={imageObj.color?.hexCode || ""}
+                        onChange={(e) =>
+                          handleImageColorChange(index, e.target.value)
+                        }
+                        displayEmpty
+                        sx={{ "& .MuiSelect-select": { py: 0.5 } }}
+                      >
+                        <MenuItem value="">
+                          <em>Select Color</em>
+                        </MenuItem>
+                        {formData.specifications.colors.available.map(
+                          (color) => (
+                            <MenuItem
+                              key={color.hexCode}
+                              value={color.hexCode}
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  width: 16,
+                                  height: 16,
+                                  bgcolor: color.hexCode,
+                                  borderRadius: "50%",
+                                  border: "1px solid #ccc",
+                                }}
+                              />
+                              {color.name}
+                            </MenuItem>
+                          )
+                        )}
+                      </Select>
+                    </FormControl>
+                  </Box>
+                  <IconButton
+                    size="small"
+                    onClick={() => handleRemoveNewImage(index)}
+                    sx={{
+                      position: "absolute",
+                      top: 4,
+                      right: 4,
+                      bgcolor: "rgba(255,255,255,0.9)",
+                      "&:hover": {
+                        bgcolor: "rgba(255,255,255,1)",
+                      },
+                    }}
+                  >
+                    <Delete fontSize="small" />
                   </IconButton>
+                  {imageObj.isPrimary && (
+                    <Chip
+                      label="Primary"
+                      size="small"
+                      color="primary"
+                      sx={{
+                        position: "absolute",
+                        top: 4,
+                        left: 4,
+                        height: 24,
+                      }}
+                    />
+                  )}
                 </Box>
               ))}
             </Box>
