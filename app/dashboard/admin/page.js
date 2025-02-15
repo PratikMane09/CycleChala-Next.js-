@@ -28,6 +28,7 @@ import {
   LogOut,
   User,
   ListOrderedIcon,
+  Home,
 } from "lucide-react";
 
 import { useRouter } from "next/navigation";
@@ -35,6 +36,7 @@ import Categories from "./component/Categories";
 import Product from "./component/Product";
 import AdminOrders from "./component/AdminOrders";
 import UserController from "./component/UserController";
+import HomepageProductsManager from "./component/HomepageProductsManager";
 const AdminDashboard = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -57,14 +59,13 @@ const AdminDashboard = () => {
     { name: "Category", icon: <ChartBar />, value: "category" },
     { name: "Product", icon: <BoxIcon />, value: "product" },
     { name: "Order", icon: <ListOrderedIcon />, value: "order" },
+    { name: "Homepage", icon: <Home />, value: "homepage" },
   ];
   const handlelogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
     localStorage.removeItem("email");
 
-    setUserRole(null);
-    setUserEmail(null);
     router.push("/");
   };
   return (
@@ -255,6 +256,8 @@ const AdminDashboard = () => {
           {activePage === "category" && <Categories />}
           {activePage === "product" && <Product />}
           {activePage === "order" && <AdminOrders />}
+
+          {activePage === "homepage" && <HomepageProductsManager />}
         </Box>
       </Box>
     </Box>

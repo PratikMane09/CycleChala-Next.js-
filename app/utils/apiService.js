@@ -233,6 +233,22 @@ class ApiService {
     });
     return this.handleResponse(response);
   }
+
+  async updateHomepageSettings(id, displaySettings) {
+    console.log("display", displaySettings);
+    const response = await fetch(
+      `${API_BASE_URL}/api/admin/products/${id}/homepage`,
+      {
+        method: "POST",
+        headers: {
+          ...this.getFileHeaders(),
+          "Content-Type": "application/json", // Add this line
+        },
+        body: JSON.stringify(displaySettings), // Add JSON.stringify
+      }
+    );
+    return this.handleResponse(response);
+  }
 }
 
 // Create the instance only on the client side
