@@ -147,6 +147,20 @@ const Product = () => {
 
   const handleEdit = (product) => {
     const productToEdit = JSON.parse(JSON.stringify(product));
+
+    // Convert binary image data to displayable format
+    if (productToEdit.images) {
+      productToEdit.images = productToEdit.images.map((image) => ({
+        ...image,
+        // Keep original data for reference
+        _id: image._id,
+        isPrimary: image.isPrimary,
+        color: image.color,
+        alt: image.alt,
+        contentType: image.contentType,
+      }));
+    }
+
     setSelectedProduct(productToEdit);
     setShowForm(true);
   };

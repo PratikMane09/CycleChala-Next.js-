@@ -27,8 +27,6 @@ const ProductForm = ({
   onCancel,
   loading,
 }) => {
-  const [existingImages, setExistingImages] = useState([]);
-  const [newImages, setNewImages] = useState([]);
   const [newColor, setNewColor] = useState({ name: "", hexCode: "" });
 
   const [formData, setFormData] = useState({
@@ -108,6 +106,17 @@ const ProductForm = ({
   const [newTag, setNewTag] = useState("");
   const [newMaintenance, setNewMaintenance] = useState("");
   const [newAccessory, setNewAccessory] = useState("");
+  const [existingImages, setExistingImages] = useState(
+    initialData?.images || []
+  );
+  const [newImages, setNewImages] = useState([]);
+
+  useEffect(() => {
+    if (initialData?.images) {
+      setExistingImages(initialData.images);
+    }
+  }, [initialData]);
+
   const handleColorAdd = () => {
     if (newColor.name && newColor.hexCode) {
       setFormData((prev) => ({
@@ -237,14 +246,34 @@ const ProductForm = ({
       )
     );
   };
-  // Add function to remove existing image
   const handleRemoveExistingImage = (index) => {
-    setExistingImages(existingImages.filter((_, i) => i !== index));
+    setExistingImages((prev) => {
+      const newImages = [...prev];
+      newImages.splice(index, 1);
+
+      // If we removed the primary image, set new primary if available
+      if (prev[index].isPrimary && newImages.length > 0) {
+        newImages[0].isPrimary = true;
+      }
+
+      return newImages;
+    });
   };
 
-  // Add function to remove new image
   const handleRemoveNewImage = (index) => {
-    setNewImages(newImages.filter((_, i) => i !== index));
+    setNewImages((prev) => {
+      const newImages = [...prev];
+      const removedImage = newImages.splice(index, 1)[0];
+
+      // If we removed the primary image, set new primary if available
+      if (removedImage.isPrimary) {
+        if (newImages.length > 0 && existingImages.length === 0) {
+          newImages[0].isPrimary = true;
+        }
+      }
+
+      return newImages;
+    });
   };
 
   const handleArrayAdd = (field, value, section) => {
@@ -301,45 +330,71 @@ const ProductForm = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  // In ProductForm.jsx, modify the handleSubmit function:
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    const formDataObj = new FormData();
+    try {
+      const formDataObj = new FormData();
 
-    // Prepare the submit data
-    const submitData = {
-      ...formData,
-      keepExistingImages: existingImages.length > 0,
-      existingImageIds: existingImages.map((img) => img._id),
-    };
+      // Prepare image data including both existing and new images
+      const combinedImageData = {
+        // Track which existing images to keep and their updated metadata
+        existingImages: existingImages.map((image) => ({
+          _id: image._id,
+          isPrimary: image.isPrimary,
+          color: image.color,
+          alt: `${formData.name} - ${image.color?.name || "Image"}`,
+          toDelete: false,
+        })),
+        // New images with their metadata
+        newImages: newImages.map((image, index) => ({
+          file: image.file,
+          isPrimary: existingImages.length === 0 && index === 0,
+          color: image.color,
+          alt: `${formData.name} - ${image.color?.name || "Image"} ${
+            index + 1
+          }`,
+          filename: image.file.name,
+        })),
+      };
 
-    formDataObj.append("data", JSON.stringify(submitData));
+      // Prepare the submit data
+      const submitData = {
+        ...formData,
+        imageUpdates: {
+          existingImages: combinedImageData.existingImages,
+          hasNewImages: combinedImageData.newImages.length > 0,
+        },
+      };
 
-    // Append all images
-    newImages.forEach((image, index) => {
-      formDataObj.append("images", image.file);
-    });
+      // Append the main form data
+      formDataObj.append("data", JSON.stringify(submitData));
 
-    // Make sure color data is properly structured
-    const imageMetadata = newImages.map((image, index) => ({
-      isPrimary: existingImages.length === 0 && index === 0,
-      filename: image.file.name,
-      alt: `${formData.name} - ${image.color?.name || "Image"} ${index + 1}`,
-      color: image.color
-        ? {
-            name: image.color.name,
-            hexCode: image.color.hexCode,
-          }
-        : null,
-    }));
+      // Append new images and their metadata
+      combinedImageData.newImages.forEach((image, index) => {
+        formDataObj.append("images", image.file);
+      });
 
-    formDataObj.append("imageMetadata", JSON.stringify(imageMetadata));
+      // Append metadata for new images
+      formDataObj.append(
+        "imageMetadata",
+        JSON.stringify(
+          combinedImageData.newImages.map((image) => ({
+            filename: image.filename,
+            isPrimary: image.isPrimary,
+            alt: image.alt,
+            color: image.color,
+          }))
+        )
+      );
 
-    onSubmit(formDataObj);
+      onSubmit(formDataObj);
+    } catch (error) {
+      console.error("Error preparing form data:", error);
+      // Handle error appropriately
+    }
   };
-
   return (
     <form onSubmit={handleSubmit}>
       <Grid container spacing={3}>
@@ -831,6 +886,7 @@ const ProductForm = ({
             </Box>
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
               {/* Existing Images */}
+              {/* Existing Images */}
               {existingImages.map((image, index) => (
                 <Box
                   key={`existing-${index}`}
@@ -841,9 +897,13 @@ const ProductForm = ({
                   }}
                 >
                   <img
-                    src={`data:${image.contentType};base64,${Buffer.from(
+                    src={
                       image.data
-                    ).toString("base64")}`}
+                        ? `data:${image.contentType};base64,${image.data}`
+                        : URL.createObjectURL(
+                            new Blob([image.data], { type: image.contentType })
+                          )
+                    }
                     alt={image.alt || `Product Image ${index + 1}`}
                     style={{
                       width: "100%",
@@ -865,21 +925,74 @@ const ProductForm = ({
                   >
                     <Delete />
                   </IconButton>
-                  {image.isPrimary && (
-                    <Chip
-                      label="Primary"
-                      size="small"
-                      color="primary"
-                      sx={{
-                        position: "absolute",
-                        bottom: 5,
-                        right: 5,
-                      }}
-                    />
-                  )}
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      bgcolor: "rgba(255,255,255,0.9)",
+                    }}
+                  >
+                    <FormControl fullWidth size="small">
+                      <Select
+                        value={image.color?.hexCode || ""}
+                        onChange={(e) => {
+                          const selectedColor =
+                            formData.specifications.colors.available.find(
+                              (c) => c.hexCode === e.target.value
+                            );
+                          setExistingImages((prev) =>
+                            prev.map((img, i) =>
+                              i === index
+                                ? {
+                                    ...img,
+                                    color: selectedColor
+                                      ? {
+                                          name: selectedColor.name,
+                                          hexCode: selectedColor.hexCode,
+                                        }
+                                      : null,
+                                  }
+                                : img
+                            )
+                          );
+                        }}
+                        displayEmpty
+                        sx={{ "& .MuiSelect-select": { py: 0.5 } }}
+                      >
+                        <MenuItem value="">
+                          <em>Select Color</em>
+                        </MenuItem>
+                        {formData.specifications.colors.available.map(
+                          (color) => (
+                            <MenuItem
+                              key={color.hexCode}
+                              value={color.hexCode}
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  width: 16,
+                                  height: 16,
+                                  bgcolor: color.hexCode,
+                                  borderRadius: "50%",
+                                  border: "1px solid #ccc",
+                                }}
+                              />
+                              {color.name}
+                            </MenuItem>
+                          )
+                        )}
+                      </Select>
+                    </FormControl>
+                  </Box>
                 </Box>
               ))}
-
               {/* New Images */}
               {newImages.map((imageObj, index) => (
                 <Box
