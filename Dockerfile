@@ -5,8 +5,8 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci
+# Install dependencies (using npm install since package-lock.json might not exist)
+RUN npm install
 
 # Copy source code
 COPY . .
@@ -24,7 +24,7 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/package*.json ./
 
 # Install production dependencies only
-RUN npm ci --production
+RUN npm install --production
 
 # Expose port
 EXPOSE 3000
