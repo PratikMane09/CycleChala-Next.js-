@@ -3,7 +3,7 @@ import { CartProvider } from "./context/CartContext";
 import Script from "next/script";
 import Header from "./component/Header";
 import Footer from "./component/Footer";
-
+import "./globals.css";
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
