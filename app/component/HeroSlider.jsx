@@ -14,17 +14,17 @@ const HeroSlider = () => {
     {
       image: "/Images/banner/slider-1.jpg",
       subtitle: "Premium Cycles",
-      title: "Get premium Cyycles at best prices",
+      title: "Experience Ultimate Performance",
     },
     {
       image: "/Images/banner/slider-2.jpg",
-      subtitle: "Premium Cycles",
-      title: "Get premium Cyyccles at best prices",
+      subtitle: "Urban Commuters",
+      title: "Redefine Your Daily Journey",
     },
     {
       image: "/Images/banner/slider-3.jpg",
-      subtitle: "Premium Cycles",
-      title: "Get premium Cyclles at best prices",
+      subtitle: "Adventure Series",
+      title: "Explore Beyond Boundaries",
     },
   ];
 
@@ -85,16 +85,16 @@ const HeroSlider = () => {
 
             {/* Slide Content */}
             <div className="text-center text-black">
-              <h4 className="text-2xl md:text-3xl mb-3 font-medium">
+              <h4 className="text-xl md:text-2xl mb-3 font-semibold text-blue-600 tracking-wide">
                 {slides[currentSlide].subtitle}
               </h4>
-              <h1 className="text-4xl md:text-5xl font-bold mb-6">
+              <h1 className="text-4xl md:text-6xl font-bold mb-6 font-serif leading-tight">
                 {slides[currentSlide].title}
               </h1>
               <Link href="/shop">
                 <button
-                  className="bg-black/90 text-white px-8 py-4 text-lg font-semibold 
-                    rounded-full hover:bg-white hover:text-black transition-all"
+                  className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 text-lg font-semibold 
+        rounded-full hover:shadow-lg hover:opacity-90 transition-all duration-300 shadow-md"
                 >
                   Shop Now
                 </button>

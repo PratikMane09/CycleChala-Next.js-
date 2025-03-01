@@ -77,7 +77,7 @@ const features = [
 // Enhanced Bicycle Parts Section Component
 const BicyclePartsSection = () => (
   <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-all duration-300">
-    <h2 className="text-2xl font-bold text-blue-900 mb-8 text-center">
+    <h2 className="text-2xl font-bold text-blue-900 mb-8 text-center font-serif">
       Bicycle Parts We Service
     </h2>
     <div className="relative aspect-[16/9] w-full mb-8">
@@ -166,7 +166,7 @@ const ServiceCard = ({ service }) => {
 
 const ServicePage = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50 py-16 font-sans">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50 py-16 font-serif mt-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Enhanced Hero Section */}
         <div className="text-center mb-20">

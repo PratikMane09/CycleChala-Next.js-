@@ -18,16 +18,15 @@ RUN npm run build
 FROM node:18-alpine
 WORKDIR /app
 
-# Copy built assets and necessary files
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
+# Copy necessary files from builder
 COPY --from=builder /app/package*.json ./
-
-# Install production dependencies only
-RUN npm install --production
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/next.config.js ./
 
 # Expose port
 EXPOSE 3000
 
-# Start the application
+# Start the application for production
 CMD ["npm", "start"]

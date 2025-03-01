@@ -30,19 +30,24 @@ const ProductImage = memo(({ images }) => {
 ProductImage.displayName = "ProductImage";
 
 // Separate component for rating stars to prevent unnecessary re-renders
-const RatingStars = memo(({ rating }) => (
-  <div className="flex text-yellow-400">
-    {[...Array(5)].map((_, i) => (
-      <Star
-        key={i}
-        size={10}
-        className={
-          i < Math.floor(rating || 0) ? "fill-yellow-400" : "fill-gray-200"
-        }
-      />
-    ))}
-  </div>
-));
+const RatingStars = memo(({ rating }) => {
+  // Generate random rating between 3.5 and 5 if rating is not provided
+  const displayRating = rating || Math.random() * 1.5 + 3.5;
+
+  return (
+    <div className="flex text-yellow-400">
+      {[...Array(5)].map((_, i) => (
+        <Star
+          key={i}
+          size={10}
+          className={
+            i < Math.floor(displayRating) ? "fill-yellow-400" : "fill-gray-200"
+          }
+        />
+      ))}
+    </div>
+  );
+});
 
 RatingStars.displayName = "RatingStars";
 
@@ -128,7 +133,7 @@ const ProductCard = memo(
           <div className="flex items-center gap-1 mb-1 sm:mb-3">
             <RatingStars rating={product.rating?.average} />
             <span className="text-[10px] sm:text-sm text-gray-500">
-              ({product.rating?.count || 0})
+              {/* ({product.rating?.count || 0}) */}
             </span>
           </div>
 

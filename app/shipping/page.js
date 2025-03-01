@@ -19,25 +19,25 @@ const ShippingPolicy = () => {
       icon: Truck,
       title: "Free Shipping",
       description: "We offer complimentary shipping on all orders across India",
-      gradient: "from-blue-500 to-cyan-500",
+      gradient: "from-sky-400 to-sky-600",
     },
     {
       icon: Clock,
       title: "Delivery Time",
       description: "Standard delivery within 3-5 business days",
-      gradient: "from-purple-500 to-pink-500",
+      gradient: "from-sky-400 to-sky-600",
     },
     {
       icon: MapPin,
       title: "Coverage Area",
       description: "We deliver to all major cities and locations across India",
-      gradient: "from-orange-500 to-red-500",
+      gradient: "from-sky-400 to-sky-600",
     },
     {
       icon: Package,
       title: "Order Tracking",
       description: "Real-time tracking available for all shipments",
-      gradient: "from-green-500 to-emerald-500",
+      gradient: "from-sky-400 to-sky-600",
     },
   ];
 
@@ -76,7 +76,7 @@ const ShippingPolicy = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-black pt-24 pb-16">
+    <div className="min-h-screen bg-white pt-24 pb-16">
       <div className="container mx-auto px-4">
         {/* Header */}
         <motion.div
@@ -84,10 +84,10 @@ const ShippingPolicy = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6 font-serif">
             Shipping & Delivery Policy
           </h1>
-          <p className="text-gray-400 max-w-3xl mx-auto text-lg">
+          <p className="text-gray-600 max-w-3xl mx-auto text-lg">
             We want to ensure your order reaches you safely and on time. Please
             review our shipping policy for all the details about delivery.
           </p>
@@ -101,7 +101,7 @@ const ShippingPolicy = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="bg-gray-900 rounded-xl p-6 border border-gray-800"
+              className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
             >
               <div
                 className={`w-12 h-12 rounded-full bg-gradient-to-r ${feature.gradient} 
@@ -109,10 +109,10 @@ const ShippingPolicy = () => {
               >
                 <feature.icon className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">
+              <h3 className="text-xl font-semibold text-gray-800 mb-3">
                 {feature.title}
               </h3>
-              <p className="text-gray-400 leading-relaxed">
+              <p className="text-gray-600 leading-relaxed">
                 {feature.description}
               </p>
             </motion.div>
@@ -123,28 +123,28 @@ const ShippingPolicy = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gray-900 rounded-2xl p-8 border border-gray-800 mb-16"
+          className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm mb-16"
         >
-          <h2 className="text-2xl font-bold text-white mb-8">
+          <h2 className="text-2xl font-bold text-gray-800 mb-8">
             Shipping Process
           </h2>
           <div className="space-y-6">
             {shippingSteps.map((step, index) => (
               <div key={index} className="flex items-start space-x-4">
                 <div
-                  className={`w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 
+                  className={`w-8 h-8 rounded-full bg-gradient-to-r from-sky-400 to-sky-600 
                   flex-shrink-0 flex items-center justify-center text-white font-bold`}
                 >
                   {index + 1}
                 </div>
                 <div className="flex-grow">
-                  <h3 className="text-lg font-semibold text-white mb-2">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">
                     {step.title}
                   </h3>
-                  <p className="text-gray-400">{step.description}</p>
+                  <p className="text-gray-600">{step.description}</p>
                 </div>
                 {index < shippingSteps.length - 1 && (
-                  <ArrowRight className="w-6 h-6 text-gray-600 flex-shrink-0 hidden md:block" />
+                  <ArrowRight className="w-6 h-6 text-sky-400 flex-shrink-0 hidden md:block" />
                 )}
               </div>
             ))}
@@ -157,42 +157,42 @@ const ShippingPolicy = () => {
           animate={{ opacity: 1, y: 0 }}
           className="grid md:grid-cols-2 gap-8 mb-16"
         >
-          <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
-            <h2 className="text-xl font-bold text-white mb-6">
+          <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+            <h2 className="text-xl font-bold text-gray-800 mb-6">
               Important Delivery Notes
             </h2>
             <div className="space-y-4">
               {deliveryNotes.map((note, index) => (
                 <div key={index} className="flex items-start space-x-3">
-                  <CheckCircle className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-300">{note}</span>
+                  <CheckCircle className="w-5 h-5 text-sky-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700">{note}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
-            <h2 className="text-xl font-bold text-white mb-6">
+          <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+            <h2 className="text-xl font-bold text-gray-800 mb-6">
               Delayed Deliveries
             </h2>
             <div className="space-y-4">
               <div className="flex items-start space-x-3">
                 <AlertCircle className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
-                <p className="text-gray-300">
+                <p className="text-gray-700">
                   If your delivery is delayed for any reason, we will:
                 </p>
               </div>
               <ul className="space-y-3 pl-8">
-                <li className="text-gray-300 list-disc">
+                <li className="text-gray-700 list-disc">
                   Notify you immediately via email or phone
                 </li>
-                <li className="text-gray-300 list-disc">
+                <li className="text-gray-700 list-disc">
                   Provide a revised delivery estimate
                 </li>
-                <li className="text-gray-300 list-disc">
+                <li className="text-gray-700 list-disc">
                   Offer alternative delivery options if available
                 </li>
-                <li className="text-gray-300 list-disc">
+                <li className="text-gray-700 list-disc">
                   Compensate for significant delays
                 </li>
               </ul>
@@ -204,13 +204,13 @@ const ShippingPolicy = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl p-8 border border-gray-800"
+          className="bg-gradient-to-r from-sky-50 to-sky-100 rounded-2xl p-8 border border-sky-200"
         >
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-white mb-4">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">
               Questions About Shipping?
             </h2>
-            <p className="text-gray-400 mb-8">
+            <p className="text-gray-600 mb-8">
               Our customer service team is ready to assist you with any
               shipping-related queries.
             </p>
@@ -218,7 +218,7 @@ const ShippingPolicy = () => {
               <a
                 href="mailto:prakashcyclesecom@gmail.com"
                 className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r 
-                  from-blue-500 to-purple-500 rounded-lg text-white font-semibold
+                  from-sky-400 to-sky-600 rounded-lg text-white font-semibold
                   hover:opacity-90 transition-opacity gap-2"
               >
                 <Mail className="w-5 h-5" />
@@ -227,8 +227,8 @@ const ShippingPolicy = () => {
               <a
                 href="tel:+917038698440"
                 className="inline-flex items-center justify-center px-6 py-3 
-                  bg-gray-800 rounded-lg text-white font-semibold
-                  hover:bg-gray-700 transition-colors gap-2"
+                  bg-white border border-sky-400 rounded-lg text-sky-600 font-semibold
+                  hover:bg-sky-50 transition-colors gap-2"
               >
                 <Phone className="w-5 h-5" />
                 Call Us
