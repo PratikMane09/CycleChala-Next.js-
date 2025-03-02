@@ -154,13 +154,18 @@ class ApiService {
     try {
       const params = new URLSearchParams();
 
-      // Only add parameters that have values
+      // Add page parameter
+      if (filters.page) {
+        params.append("page", filters.page);
+      }
+
       if (filters.search) {
         params.append("search", filters.search);
       }
 
-      if (filters.categories && filters.categories.length > 0) {
-        params.append("category", filters.categories.join(","));
+      if (filters.category) {
+        // Note: Changed from categories to category based on your component usage
+        params.append("category", filters.category);
       }
 
       if (filters.priceRange?.min) {
@@ -175,7 +180,6 @@ class ApiService {
         params.append("rating", filters.rating);
       }
 
-      // Only append inStock if it's true
       if (filters.inStock === true) {
         params.append("inStock", "true");
       }

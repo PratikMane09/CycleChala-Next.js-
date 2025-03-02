@@ -23,6 +23,7 @@ import {
 } from "@mui/material";
 import { Edit, Search, GripVertical } from "lucide-react";
 import { apiService } from "../../../utils/apiService";
+import { Paginationn } from "./Paginationn";
 
 const sections = [
   { value: "featured", label: "Featured Products" },
@@ -41,7 +42,7 @@ const HomepageProductsManager = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
-
+  const [totalPages, setTotalPages] = useState(1);
   const [displaySettings, setDisplaySettings] = useState({
     isDisplayed: false,
     priority: 0,
@@ -53,7 +54,6 @@ const HomepageProductsManager = () => {
   useEffect(() => {
     fetchProducts();
   }, [currentPage, searchTerm]);
-
   const fetchProducts = async () => {
     try {
       setLoading(true);
@@ -62,6 +62,7 @@ const HomepageProductsManager = () => {
         search: searchTerm,
       });
       setProducts(response.data.products);
+      setTotalPages(response.data.pagination.pages); // Add this line
     } catch (err) {
       setError("Failed to fetch products");
       console.error(err);
@@ -224,7 +225,13 @@ const HomepageProductsManager = () => {
           </div>
         </CardContent>
       </Card>
-
+      <div className="flex justify-center mt-6">
+        <Paginationn
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      </div>
       <Dialog
         open={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}

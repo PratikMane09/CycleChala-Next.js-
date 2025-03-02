@@ -1,7 +1,8 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   ChevronRight,
@@ -12,12 +13,21 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { API_BASE_URL } from "../../config/api";
+import { useWishlist } from "../context/WishlistContext";
 
 const ProductDisplay = () => {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [productData, setProductData] = useState({});
   const [activeTab, setActiveTab] = useState("featured");
-
+  const [token, setToken] = useState(null);
+  const {
+    addToWishlist,
+    removeFromWishlist,
+    items: wishlistItems,
+    isInitialized: isWishlistInitialized,
+    fetchWishlist,
+  } = useWishlist();
   // Sections configuration
   const sections = [
     {
@@ -46,6 +56,12 @@ const ProductDisplay = () => {
       description: "Limited time deals you don't want to miss",
     },
   ];
+
+  // Check for authentication token on component mount
+  useEffect(() => {
+    const authToken = localStorage.getItem("token");
+    setToken(authToken);
+  }, []);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -82,6 +98,31 @@ const ProductDisplay = () => {
       router.push(`/products/${slug}`);
     }
   };
+  const isInWishlist = useCallback(
+    (productId) => {
+      return (
+        wishlistItems?.some(
+          (item) =>
+            item.product?._id === productId || item.product === productId
+        ) ?? false
+      );
+    },
+    [wishlistItems]
+  );
+  // Wishlist and cart handlers
+  const handleWishlistToggle = useCallback(
+    (productId) => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/login");
+        return;
+      }
+      isInWishlist(productId)
+        ? removeFromWishlist(productId)
+        : addToWishlist(productId);
+    },
+    [token, isInWishlist, removeFromWishlist, addToWishlist, router]
+  );
 
   // Placeholder data for skeleton loading
   const skeletonItems = Array(6).fill(null);
@@ -102,11 +143,46 @@ const ProductDisplay = () => {
     return discountedPrice.toFixed(2);
   };
 
+  // Convert binary image data to usable source
+  const getImageSource = (image) => {
+    if (!image) return "/Images/placeholder.jpg";
+
+    // If image has binary data
+    if (image.data && image.data.data && Array.isArray(image.data.data)) {
+      try {
+        // Convert buffer array to Uint8Array
+        const uint8Array = new Uint8Array(image.data.data);
+
+        // Convert to binary string
+        let binaryString = "";
+        uint8Array.forEach((byte) => {
+          binaryString += String.fromCharCode(byte);
+        });
+
+        // Convert to base64
+        const base64 = btoa(binaryString);
+
+        return `data:${image.contentType || "image/jpeg"};base64,${base64}`;
+      } catch (error) {
+        console.error("Error processing image data:", error);
+        return "/Images/placeholder.jpg";
+      }
+    }
+
+    // If image has filename
+    if (image.filename) {
+      return `/api/images/${image.filename}`;
+    }
+
+    return "/Images/placeholder.jpg";
+  };
+
   const renderProductCard = (product, index) => {
     const gradient = gradientMap[activeTab] || "from-blue-600 to-cyan-500";
 
     // Extract necessary product data
     const {
+      _id,
       name,
       price,
       rating,
@@ -117,9 +193,7 @@ const ProductDisplay = () => {
 
     // Find primary image or use first image
     const primaryImage = images?.find((img) => img.isPrimary) || images?.[0];
-    const imageUrl = primaryImage
-      ? `/api/images/${primaryImage.filename}`
-      : "/Images/placeholder.jpg";
+    const imageUrl = getImageSource(primaryImage);
 
     // Calculate pricing
     const basePrice = price?.base || 0;
@@ -129,7 +203,7 @@ const ProductDisplay = () => {
 
     return (
       <motion.div
-        key={`${product._id || index}`}
+        key={`${_id || index}`}
         className="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 p-3"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -141,13 +215,24 @@ const ProductDisplay = () => {
             <div
               className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-10`}
             />
-            <Image
-              src={imageUrl}
-              alt={name}
-              fill
-              className="object-cover transition-transform duration-300 hover:scale-110"
-            />
+            <div className="relative w-full h-full">
+              <Image
+                src={imageUrl}
+                alt={name || "Product Image"}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover transition-transform duration-300 hover:scale-110"
+                onError={(e) => {
+                  e.target.src = "/Images/placeholder.jpg";
+                }}
+              />
+            </div>
             <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleWishlistToggle(_id);
+              }}
               className="absolute top-4 right-4 p-2 bg-gray-100/50 backdrop-blur-md rounded-full 
                 hover:bg-gray-200 transition-colors"
             >
@@ -184,7 +269,7 @@ const ProductDisplay = () => {
             </h3>
 
             <div className="mb-4 flex-grow">
-              {(product.features || []).slice(0, 3).map((feature, idx) => (
+              {(features || []).slice(0, 3).map((feature, idx) => (
                 <div
                   key={idx}
                   className="flex items-center text-xs text-gray-600 mb-1"
@@ -215,7 +300,7 @@ const ProductDisplay = () => {
             </div>
 
             <Link
-              href={`/products/${metadata.slug || product._id}`}
+              href={`/products/${metadata.slug || _id}`}
               className={`w-full inline-flex items-center justify-center px-4 py-2 rounded-lg 
                 bg-gradient-to-r ${gradient} text-white text-sm font-semibold 
                 hover:opacity-90 transition-opacity duration-300`}
